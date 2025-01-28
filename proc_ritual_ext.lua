@@ -38,7 +38,7 @@ local function GetExtraLocationEffect(c,rc)
 	local effs={c:IsHasEffect(EFFECT_EXTRA_RITUAL_LOCATION)}
 	for _,eff in ipairs(effs) do
 		local val=eff:GetValue()
-		if not val or (type(val)=="function" and val(eff,c,rc)) or val<=1 then
+		if (type(val)=="function" and val(eff,c,rc)) or val==1 then
 			return eff
 		end
 	end

@@ -2,7 +2,7 @@ name: Scripts repository sync
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   commit:
     runs-on: ubuntu-latest
