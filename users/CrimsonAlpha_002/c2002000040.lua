@@ -88,6 +88,7 @@ function s.ritgy(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_EXTRA_RITUAL_LOCATION)
 	e1:SetProperty(EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN)
 	e1:SetTargetRange(LOCATION_GRAVE,0)
+	e1:SetValue(1)
 	e1:SetReset(RESET_PHASE|PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
