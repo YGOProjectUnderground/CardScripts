@@ -1,5 +1,4 @@
---真竜剣士マスターP
---Master Peace, the True Dracoslayer
+--Infector Pain, the True Dracoverlord
 Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
@@ -20,30 +19,36 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg) 
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--Negate
+	--disable
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_CHAINING)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_DISABLE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
-	e2:SetCondition(s.discon)
-	e2:SetTarget(s.distg)
-	e2:SetOperation(s.disop)
+	e2:SetTargetRange(0,LOCATION_PZONE)
 	c:RegisterEffect(e2)
-	--summon
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e3:SetCode(EVENT_DESTROYED)
-	e3:SetCondition(s.condition)
-	e3:SetTarget(s.target)
-	e3:SetOperation(s.operation)
+	local e3=e2:Clone()
+	e3:SetTargetRange(0,LOCATION_MZONE+LOCATION_GRAVE)
+	e3:SetTarget(s.distg)
 	c:RegisterEffect(e3)
+	--disable effect
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e4:SetCode(EVENT_CHAIN_SOLVING)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCondition(s.discon)
+	e4:SetOperation(s.disop)
+	c:RegisterEffect(e4)
+	--summon
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(id,1))
+	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e5:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e5:SetCode(EVENT_DESTROYED)
+	e5:SetCondition(s.condition)
+	e5:SetTarget(s.target)
+	e5:SetOperation(s.operation)
+	c:RegisterEffect(e5)
 end
 s.listed_series={0xc7,0xda}
 function s.rescon(sg,e,tp,mg)
@@ -99,22 +104,15 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	end
 	g:DeleteGroup()
 end
-function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
-	return Duel.IsChainNegatable(ev)
+function s.distg(e,c)
+	return c:IsType(TYPE_MONSTER)
 end
-function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsRelateToEffect(re) and re:GetHandler():IsDestructable() then
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
-	end
+function s.discon(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
+	return re:IsActiveType(TYPE_MONSTER) and rp~=tp
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
-		Duel.Destroy(eg,REASON_EFFECT)
-	end
+	Duel.NegateEffect(ev)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

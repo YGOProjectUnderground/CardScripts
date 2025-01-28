@@ -24,7 +24,7 @@ if not CustomArchetype then
 	end
 
 
-	CustomArchetype.Shinobird={66815913,92200612,39817919,73055622,9553721,276357,2202500031
+	CustomArchetype.Shinobird={66815913,92200612,39817919,73055622,9553721,276357,2002000007
 	}
 	Card.IsSetShinobird=MakeCheck({SET_SHINOBIRD},CustomArchetype.Shinobird)
 
@@ -35,7 +35,7 @@ if not CustomArchetype then
 	59537380,13143275,86148577,40003819,87571563,50186558,47393199,11908584}
 	Card.IsSetGuardragon=MakeCheck({SET_GUARDRAGON},CustomArchetype.Guardragon)
 	
-	CustomArchetype.WNebula={90075978,2202500050}
+	CustomArchetype.WNebula={90075978,2002000026}
 	Card.IsSetWNebula=MakeCheck({SET_W_NEBULA},CustomArchetype.WNebula)
 	
 	CustomArchetype.Pikeru={81383947,75917088,58015506,74270067}
@@ -44,4 +44,3 @@ if not CustomArchetype then
 	CustomArchetype.Curran={46128076,2316186}
 	Card.IsSetCurran=MakeCheck({SET_Curran},CustomArchetype.Curran)
 end
-

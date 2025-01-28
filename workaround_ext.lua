@@ -37,7 +37,7 @@ regeff_list[REGISTER_FLAG_DRAGON_RULER]=101208047
 
 regeff_list[CUSTOM_REGISTER_FLIP]=TYPE_FLIP
 regeff_list[CUSTOM_REGISTER_LIMIT]=EFFECT_UNIQUE_CHECK
-regeff_list[CUSTOM_REGISTER_ZEFRA]=2202500107
+regeff_list[CUSTOM_REGISTER_ZEFRA]=2002000083
 Card.RegisterEffect=(function()
 	local oldf=Card.RegisterEffect
 	return function(c,e,forced,...)

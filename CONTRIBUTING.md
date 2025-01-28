@@ -1,9 +1,18 @@
-# Contributing to the Project Ignis script collection
+# Contributing to the Project Underground Script Collection
 
-Please keep all bug reports and questions on Discord; do NOT open an issue or pull request for this purpose.
+Please direct all bug reports and questions to Discord. Do **NOT** open issues or pull requests for these purposes.
 
-## Bug fixes
-- The title should be a short description, including the name of the card fixed, ideally an action in present tense.
-- Describe the bug that is fixed in the description in detail
-- Add `Closes #xxx` if this pull request is meant to close a particular issue
-- A replay or puzzle demonstrating the incorrect interaction and reference to correct rulings is helpful
+## Bug Fixes
+
+- The title should be a concise description of the fix, including the name of the card, and ideally an action in the present tense.
+- Provide a detailed description of the bug that is fixed in the pull request.
+- Include `Closes #xxx` if the pull request resolves a specific issue.
+- Attach a replay or puzzle that demonstrates the incorrect interaction. Including references to correct rulings is highly encouraged.
+
+## New Additions to the Script Project
+
+- **Overriding existing EDOPro scripts**:  
+  Scripts designed to override existing EDOPro scripts should be placed in the appropriate folder corresponding to the type of the overridden script (e.g., `anime`, `goat`, `official`).  
+
+- **Scripts for new custom cards**:  
+  Scripts for newly added custom cards must be placed in a folder named after the contributor (formatted as `contributor's name_contributor's number`). This number is assigned when the contributor is approved, following the guidelines provided in [VaultCDB](https://github.com/YGOProjectUnderground/VaultCDB.git).
