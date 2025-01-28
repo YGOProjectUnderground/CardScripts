@@ -1,6 +1,6 @@
 -- initialize script extensions
 Duel.LoadScript("constant_ext.lua")
-Duel.LoadScript("cards_specific_functions_ext.lua")
+Duel.LoadScript("card_counter_constants_ext.lua")
 Duel.LoadScript("utility_ext.lua")
 Duel.LoadScript("cards_specific_functions_ext.lua")
 Duel.LoadScript("proc_fusion_spell_ext.lua")
