@@ -1,1 +1,0 @@
-Duel.LoadScript("../_load_.lua")
