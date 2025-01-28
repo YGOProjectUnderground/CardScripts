@@ -26,7 +26,7 @@ jobs:
         if [ $(git rev-list --count HEAD) -eq 1 ]; then
           ADDED=$(find . -type f -name "*.lua" | c1grep -vP "(^|/)\..*")
         else
-          ADDED=$(git diff-tree --no-commit-id --name-only -r HEAD | c1grep -vP "(^|/)\..*" | c1grep -P "\.lua$")
+          ADDED=$(git diff-tree --no-commit-id --name-only -r HEAD --diff-filter=AM | c1grep -vP "(^|/)\..*" | c1grep -P "\.lua$")
         fi
         
         if [[ "$ADDED" ]]; then
