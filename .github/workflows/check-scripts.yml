@@ -26,5 +26,5 @@ jobs:
         curl --retry 5 --connect-timeout 30 --location --remote-header-name --output libocgcore.so https://github.com/ProjectIgnis/bin/raw/master/libocgcore.so
     - name: Run checker
       run: |
-        folders=$(find . -maxdepth 2 -type d ! -path './.*')
+        folders=$(find . -maxdepth 1 -type d ! -path './.*')
         ./script_syntax_check $folders
