@@ -8,6 +8,12 @@ function Card.GetExtraMonsterType(c)
   local result = c:GetType()&extra_type
   return result
 end
+local function CheckEffectUniqueCheck(c,tp,code)
+	if not (aux.FaceupFilter(Card.IsCode,code) and c:IsHasEffect(EFFECT_UNIQUE_CHECK)) then 
+		return false
+	end
+	return true
+end
 local function AdjustOp(self,opp,limit,code,location)
 	return function(e,tp,eg,ep,ev,re,r,rp)
 		local c=e:GetHandler()
@@ -94,12 +100,6 @@ end
 -- Returns the max number of copies the card can have on the field
 function Card.GetMaxLimitForCard(c)
 	return c:GetFlagEffectLabel(CUSTOM_REGISTER_LIMIT)
-end
-local function CheckEffectUniqueCheck(c,tp,code)
-	if not (aux.FaceupFilter(Card.IsCode,code) and c:IsHasEffect(EFFECT_UNIQUE_CHECK)) then 
-		return false
-	end
-	return true
 end
 function Auxiliary.CheckEffectUniqueCheck(c,tp,code)
 	if not (aux.FaceupFilter(Card.IsCode,code) and c:IsHasEffect(EFFECT_UNIQUE_CHECK)) then 
