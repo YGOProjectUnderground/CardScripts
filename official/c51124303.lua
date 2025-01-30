@@ -1,20 +1,21 @@
 --影霊衣の万華鏡
---Nekroz Kaliedoscope
---Modified for CrimsonAlpha
+--Nekroz Kaleidoscope
 Duel.LoadScript("_load_.lua")
 local s,id=GetID()
-function s.initial_effect(c) 
-	--Activate
+function s.initial_effect(c)
+	--Ritual Summon any number of "Nekroz" Ritual Monsters whose Levels exactly equal the Level of the sent/tributed monster
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
+	e1:SetTarget(s.rittg)
+	e1:SetOperation(s.ritop)
 	c:RegisterEffect(e1)
-	--search
+	--Add 1 "Nekroz" Spell from your Deck to your hand
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
@@ -26,11 +27,18 @@ function s.initial_effect(c)
 	if not s.ritual_matching_function then
 		s.ritual_matching_function={}
 	end
-	s.ritual_matching_function[c]=aux.FilterEqualFunction(Card.IsSetCard,0xb4)
+	s.ritual_matching_function[c]=aux.FilterEqualFunction(Card.IsSetCard,SET_NEKROZ)
 end
-s.listed_series={0xb4}
+s.listed_series={SET_NEKROZ}
 function s.spfilter(c,e,tp,mc)
-	return c:IsSetCard(0xb4) and c:IsRitualMonster() and (not c.ritual_custom_check or c.ritual_custom_check(e,tp,Group.FromCards(mc),c))
+	if not c:IsLocation(LOCATION_HAND) then
+		local extra_loc_eff,used=Ritual.ExtraLocationOPTCheck(c,e:GetHandler(),tp)
+		if not extra_loc_eff or extra_loc_eff and used then return false end
+		if extra_loc_eff:GetProperty()&EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN>0 and Duel.HasFlagEffect(tp,EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN) then 
+			return false 
+		end
+	end
+	return c:IsSetCard(SET_NEKROZ) and c:IsRitualMonster() and (not c.ritual_custom_check or c.ritual_custom_check(e,tp,Group.FromCards(mc),c))
 		and (not c.mat_filter or c.mat_filter(mc,tp)) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true)
 		and mc:IsCanBeRitualMaterial(c)
 end
@@ -41,18 +49,7 @@ function s.rfilter(c,mc)
 	return lv==(mlv&0xffff) or lv==(mlv>>16)
 end
 function s.filter(c,e,tp)
-	local sg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_HAND,0,c,e,tp,c)
-	--- Custom ---
-	local location=LOCATION_HAND
-	local extra_loc=Duel.GetFlagEffectLabel(tp,CUSTOM_RITUAL_LOCATION)
-	local sg_temp
-	if Duel.GetFlagEffect(tp,CUSTOM_RITUAL_LOCATION)==1 and extra_loc and (location&extra_loc)==0 then
-		sg_temp=Duel.GetMatchingGroup(s.spfilter,tp,extra_loc,0,c,e,tp,c)
-		if #sg_temp>0 then
-			sg:Merge(sg_temp)
-		end
-	end
-	--------------
+	local sg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_HAND|LOCATION_NOTHAND,0,c,e,tp,c)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if c:IsLocation(LOCATION_MZONE) then ft=ft+1 end
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
@@ -64,7 +61,7 @@ end
 function s.mzfilter(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsControler(tp) and c:GetSequence()<5
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.rittg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 		if ft<0 then return false end
@@ -77,13 +74,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 		return mg:IsExists(s.filter,1,nil,e,tp)
 	end
-	--- Custom ---
-	local location=LOCATION_HAND
-	local extra_loc=Duel.GetFlagEffectLabel(tp,CUSTOM_RITUAL_LOCATION)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,location)
-	--------------
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.ritop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<0 then return end
 	local mg=Duel.GetRitualMaterial(tp)
@@ -97,27 +90,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local mat=mg:FilterSelect(tp,s.filter,1,1,nil,e,tp)
 	local mc=mat:GetFirst()
 	if not mc then return end
-	local sg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_HAND,0,mc,e,tp,mc)
-	--- Custom ---
-	local location=LOCATION_HAND
-	if Duel.GetFlagEffect(tp,CUSTOM_RITUAL_LOCATION)==1 then
-		local extra_loc=Duel.GetFlagEffectLabel(tp,CUSTOM_RITUAL_LOCATION)
-		local sg_temp=Duel.GetMatchingGroup(s.spfilter,tp,extra_loc,0,mc,e,tp,mc)
-		if Duel.GetFlagEffect(tp,CUSTOM_RITUAL_LOCATION)==1 and extra_loc and (location&extra_loc)==0 then
-			if #sg_temp>0 then
-				if #sg>0 and sg:CheckWithSumEqual(Card.GetLevel,mc:GetLevel(),1,ft) then
-					if Duel.SelectYesNo(tp,aux.Stringid(CUSTOM_RITUAL_LOCATION,1)) then
-						Duel.RegisterFlagEffect(tp,CUSTOM_RITUAL_LOCATION,RESET_PHASE+PHASE_END,0,1,extra_loc)
-						sg:Merge(sg_temp)
-					end
-				else
-					Duel.RegisterFlagEffect(tp,CUSTOM_RITUAL_LOCATION,RESET_PHASE+PHASE_END,0,1,extra_loc)
-					sg:Merge(sg_temp)
-				end
-			end
-		end
-	end 
-	--------------
+	local sg=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter),tp,LOCATION_HAND|LOCATION_NOTHAND,0,mc,e,tp,mc)
 	if mc:IsLocation(LOCATION_MZONE) then ft=ft+1 end
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
 	local b1=sg:IsExists(s.rfilter,1,nil,mc)
@@ -130,11 +103,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		if not mc:IsLocation(LOCATION_EXTRA) then
 			Duel.ReleaseRitualMaterial(mat)
 		else
-			Duel.SendtoGrave(mat,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)
+			Duel.SendtoGrave(mat,REASON_EFFECT|REASON_MATERIAL|REASON_RITUAL)
 		end
 		Duel.BreakEffect()
 		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 		tc:CompleteProcedure()
+		Ritual.UseExtraLocationCountLimit(tc,e:GetHandler(),tp)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local tg=sg:SelectWithSumEqual(tp,Card.GetLevel,mc:GetLevel(),1,ft)
@@ -149,9 +123,10 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 		Duel.BreakEffect()
 		tc=tg:GetFirst()
-		for tc in aux.Next(tg) do
+		for tc in tg:Iter() do
 			Duel.SpecialSummonStep(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 			tc:CompleteProcedure()
+			Ritual.UseExtraLocationCountLimit(tc,e:GetHandler(),tp)
 		end
 		Duel.SpecialSummonComplete()
 	end
@@ -160,7 +135,7 @@ function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function s.cfilter(c)
-	return c:IsSetCard(0xb4) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
+	return c:IsSetCard(SET_NEKROZ) and c:IsMonster() and c:IsAbleToRemoveAsCost() and aux.SpElimFilter(c,true)
 end
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()
@@ -171,7 +146,7 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function s.thfilter(c)
-	return c:IsSetCard(0xb4) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+	return c:IsSetCard(SET_NEKROZ) and c:IsSpell() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
