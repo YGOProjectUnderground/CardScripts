@@ -45,16 +45,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.ritualfilter),tp,LOCATION_HAND|LOCATION_NOTHAND,0,nil,e,tp,lp)
 	local tc=tg:Select(tp,1,1,nil):GetFirst()
 	if not tc then return end
-	local extra_loc_eff=Ritual.GetExtraLocationEffect(tc,e:GetHandler())
-	if extra_loc_eff and extra_loc_eff:CheckCountLimit(tp) then
-		local extra_loc=extra_loc_eff:GetTargetRange()
-		if extra_loc_eff:GetType()&EFFECT_TYPE_SINGLE>0 or extra_loc and tc:IsLocation(extra_loc) then
-			extra_loc_eff:UseCountLimit(tp)
-			if extra_loc_eff:GetProperty()&EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN>0 then
-				Duel.RegisterFlagEffect(tp,EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN,RESET_PHASE|PHASE_END,0,1)
-			end
-		end
-	end
+	Ritual.UseExtraLocationCountLimit(tc,e:GetHandler(),tp)
 	--
 	mustpay=true
 	Duel.PayLPCost(tp,tc:GetLevel()*500)
