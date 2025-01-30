@@ -9,7 +9,6 @@ Duel.GetFusionMaterial=(function()
 		return res
 	end
 end)()
-
 Duel.ConfirmDecktop=(function()
 	local oldfunc=Duel.ConfirmDecktop
 	return function(tp,count)
