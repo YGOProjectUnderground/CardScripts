@@ -1,5 +1,5 @@
 -- Nemleria Dream Creator - Pyjama
-Duel.LoadScript("_load_.lua")
+  Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
   -- handtrap
@@ -87,7 +87,7 @@ function s.prop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetDescription(3100)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
-	e1:SetRange(LOCATION_MZONE)
+	e1:SetRange(LOCATION_ONFIELD)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
 	e1:SetValue(aux.TRUE)
 	e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_CHAIN)
