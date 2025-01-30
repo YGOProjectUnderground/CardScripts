@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 
-function s.sumfilter(c,e)
+function s.sumfilter(c,e,tp)
   return c:IsSetCard(SET_NEMLERIA) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -34,11 +34,11 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_REMOVED,LOCATION_REMOVED)
 	local nsh = Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
-  if nsh > 9 and Duel.IsExistingMatchingCard(s.sumfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e)
+  if nsh > 9 and Duel.IsExistingMatchingCard(s.sumfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp)
     and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
     local maxs = nsh//10
     if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then maxs = 1 end
-    local nc = Duel.SelectMatchingCard(tp,s.sumfilter,tp,0,LOCATION_ONFIELD,1,maxs,nil,e)
+    local nc = Duel.SelectMatchingCard(tp,s.sumfilter,tp,0,LOCATION_ONFIELD,1,maxs,nil,e,tp)
   end
 end
 
@@ -59,7 +59,7 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
   local c = e:GetHandler()
 	if #g<3 then return end
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_REMOVE)
-	local sg=g:FilterSelect(1-tp,Card.IsAbleToRemove,3,3,nil,1-tp,POS_FACEDOWN)
+	local sg=g:FilterSelect(1-tp,s.rmfilter,3,3,nil,1-tp,POS_FACEDOWN)
 	if #sg == 3 then
 		if Duel.Remove(sg,POS_FACEDOWN,REASON_EFFECT) then
       --negate a face-up card
