@@ -1,5 +1,5 @@
 -- Nemleria's Nightmare :(
-Duel.LoadScript("_load_.lua")
+  Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
   -- activate
@@ -19,7 +19,7 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.IsPlayerCanSpecialSummonMonster(tp,id,0xaa,0x21,1800,1000,4,RACE_MACHINE,ATTRIBUTE_EARTH) then
+	if c:IsRelateToEffect(e) and Duel.IsPlayerCanSpecialSummonMonster(tp,id,SET_NEMLERIA,0x21,0,0,10,RACE_BEAST,ATTRIBUTE_DARK) then
 		c:AddMonsterAttribute(TYPE_EFFECT)
 		Duel.SpecialSummonStep(c,0,tp,tp,true,false,POS_FACEUP)
     c:AddMonsterAttributeComplete()
@@ -27,7 +27,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
     e1:SetType(EFFECT_TYPE_SINGLE)
     e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
     e1:SetRange(LOCATION_MZONE)
-    e1:SetCode(EFFECT_SET_ATTACK)
+    e1:SetCode(EFFECT_UPDATE_ATTACK)
     e1:SetValue(s.value)
     e1:SetReset(RESET_EVENT+RESETS_STANDARD)
     c:RegisterEffect(e1)
@@ -35,7 +35,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
     e2:SetType(EFFECT_TYPE_SINGLE)
     e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
     e2:SetRange(LOCATION_MZONE)
-    e2:SetCode(EFFECT_SET_DEFENSE)
+    e2:SetCode(EFFECT_UPDATE_DEFENSE)
     e2:SetValue(s.value)
     e2:SetReset(RESET_EVENT+RESETS_STANDARD)
     c:RegisterEffect(e2)
@@ -48,12 +48,13 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
     e3:SetCost(s.descost)
     e3:SetTarget(s.destg)
     e3:SetOperation(s.desop)
-    e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+    e3:SetReset(RESET_EVENT+RESETS_STANDARD)
     c:RegisterEffect(e3)
+    Duel.SpecialSummonComplete()
   end
 end
 function s.value(e,c)
-	return Duel.GetFieldGroupCount(c:IsFacedown(),LOCATION_REMOVED,0)*500
+	return Duel.GetMatchingGroupCount(Card.IsFacedown,c:GetControler(),LOCATION_REMOVED,LOCATION_REMOVED,nil)*500
 end
 function s.rmcfilter(c)
 	return not c:IsCode(CARD_DREAMING_NEMLERIA) and c:IsAbleToRemoveAsCost(POS_FACEDOWN)
