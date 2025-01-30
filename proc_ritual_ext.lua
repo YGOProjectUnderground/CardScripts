@@ -6,8 +6,6 @@ if not Ritual then
 	Ritual = aux.RitualProcedure
 end
 
-local LOCATION_NOTHAND=LOCATION_DECK|LOCATION_REMOVED|LOCATION_GRAVE
-
 --required functions
 local function ExtraReleaseFilter(c,tp)
 	return c:IsControler(1-tp) and c:IsHasEffect(EFFECT_EXTRA_RELEASE)
@@ -34,7 +32,7 @@ local function MergeForcedSelection(f1,f2)
 		return ret1 and repl1,ret2 or repl2
 	end
 end
-local function GetExtraLocationEffect(c,rc)
+function Ritual.GetExtraLocationEffect(c,rc)
 	local effs={c:IsHasEffect(EFFECT_EXTRA_RITUAL_LOCATION)}
 	for _,eff in ipairs(effs) do
 		local val=eff:GetValue()
@@ -43,13 +41,13 @@ local function GetExtraLocationEffect(c,rc)
 		end
 	end
 end
-local function ExtraLocationOPTCheck(c,rc,tp)
-	local extra_loc_eff=GetExtraLocationEffect(c,rc)
+function Ritual.ExtraLocationOPTCheck(c,rc,tp)
+	local extra_loc_eff=Ritual.GetExtraLocationEffect(c,rc)
 	return extra_loc_eff,extra_loc_eff and not extra_loc_eff:CheckCountLimit(tp)
 end
 function Ritual.ExtraLocFilter(c,filter,_type,e,tp,m,m2,forcedselection,specificmatfilter,lv,requirementfunc,sumpos,booltype,reqfunc)
 	if not (c:IsOriginalType(TYPE_RITUAL) and c:IsOriginalType(TYPE_MONSTER)) or (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true,sumpos) then return false end
-	local extra_loc_eff,used=ExtraLocationOPTCheck(c,e:GetHandler(),tp)
+	local extra_loc_eff,used=Ritual.ExtraLocationOPTCheck(c,e:GetHandler(),tp)
 	if not extra_loc_eff or extra_loc_eff and used then return false end
 	if extra_loc_eff:GetProperty()&EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN>0 and Duel.HasFlagEffect(tp,EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN) then return false end
 	
@@ -162,7 +160,7 @@ function(filter,_type,lv,extrafil,extraop,matfilter,stage2,location,forcedselect
 				end
 				if #tg>0 then
 					local tc=tg:GetFirst()
-					local extra_loc_eff=GetExtraLocationEffect(tc,e:GetHandler())
+					local extra_loc_eff=Ritual.GetExtraLocationEffect(tc,e:GetHandler())
 					if extra_loc_eff and extra_loc_eff:CheckCountLimit(tp) then
 						local extra_loc=extra_loc_eff:GetTargetRange()
 						if extra_loc_eff:GetType()&EFFECT_TYPE_SINGLE>0 or extra_loc and tc:IsLocation(extra_loc) then
