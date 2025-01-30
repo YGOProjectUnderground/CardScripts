@@ -1,20 +1,20 @@
 --リチュアの氷魔鏡
 --Gishki Nekromirror
 --scripted by pyrQ
---modified by Dikeido for The Underground
+--modified by Dikeido~ for The Underground
 Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activate
+	--Ritual Summon 1 Ritual Monster
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.operation)
+	e1:SetTarget(s.rittg)
+	e1:SetOperation(s.ritop)
 	c:RegisterEffect(e1)
-	--Return to the top and bottom of the Deck
+	--Place 1 "Gishki" monster in your GY on top of the Deck
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TODECK)
@@ -40,7 +40,7 @@ end
 function s.cfilter(c,e,sc)
 	return c:IsFaceup() and c:IsCanBeRitualMaterial(sc) and not c:IsImmuneToEffect(e)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.rittg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rparams={filter=aux.FilterBoolFunction(Card.IsSetCard,SET_GISHKI),lvtype=RITPROC_EQUAL,stage2=s.stage2}
 	local rittg=Ritual.Target(rparams)
 	if chk==0 then 
@@ -50,7 +50,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	rittg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.ritop(e,tp,eg,ep,ev,re,r,rp)
 	local rparams={filter=aux.FilterBoolFunction(Card.IsSetCard,SET_GISHKI),lvtype=RITPROC_EQUAL,stage2=s.stage2}
 	local rittg,ritop=Ritual.Target(rparams),Ritual.Operation(rparams)
 	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_NOTHAND,0,1,nil,e,tp)
@@ -72,6 +72,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		if Duel.SpecialSummon(sc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)==0 then return end
 		sc:CompleteProcedure()
+		Ritual.UseExtraLocationCountLimit(sc,e:GetHandler(),tp)
 		Duel.SetLP(tp,Duel.GetLP(tp)-sc:GetBaseAttack())
 	elseif op==2 then
 		--Tribute monsters from your hand or field
