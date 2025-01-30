@@ -45,6 +45,18 @@ function Ritual.ExtraLocationOPTCheck(c,rc,tp)
 	local extra_loc_eff=Ritual.GetExtraLocationEffect(c,rc)
 	return extra_loc_eff,extra_loc_eff and not extra_loc_eff:CheckCountLimit(tp)
 end
+function Ritual.UseExtraLocationCountLimit(c,rc,tp)
+	local extra_loc_eff=Ritual.GetExtraLocationEffect(c,rc)
+	if extra_loc_eff and extra_loc_eff:CheckCountLimit(tp) then
+		local extra_loc=extra_loc_eff:GetTargetRange()
+		if extra_loc_eff:GetType()&EFFECT_TYPE_SINGLE>0 or extra_loc and c:IsLocation(extra_loc) then
+			extra_loc_eff:UseCountLimit(tp)
+			if extra_loc_eff:GetProperty()&EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN>0 then
+				Duel.RegisterFlagEffect(tp,EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN,RESET_PHASE|PHASE_END,0,1)
+			end
+		end
+	end
+end
 function Ritual.ExtraLocFilter(c,filter,_type,e,tp,m,m2,forcedselection,specificmatfilter,lv,requirementfunc,sumpos,booltype,reqfunc)
 	if not (c:IsOriginalType(TYPE_RITUAL) and c:IsOriginalType(TYPE_MONSTER)) or (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true,sumpos) then return false end
 	local extra_loc_eff,used=Ritual.ExtraLocationOPTCheck(c,e:GetHandler(),tp)
@@ -160,16 +172,7 @@ function(filter,_type,lv,extrafil,extraop,matfilter,stage2,location,forcedselect
 				end
 				if #tg>0 then
 					local tc=tg:GetFirst()
-					local extra_loc_eff=Ritual.GetExtraLocationEffect(tc,e:GetHandler())
-					if extra_loc_eff and extra_loc_eff:CheckCountLimit(tp) then
-						local extra_loc=extra_loc_eff:GetTargetRange()
-						if extra_loc_eff:GetType()&EFFECT_TYPE_SINGLE>0 or extra_loc and tc:IsLocation(extra_loc) then
-							extra_loc_eff:UseCountLimit(tp)
-							if extra_loc_eff:GetProperty()&EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN>0 then
-								Duel.RegisterFlagEffect(tp,EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN,RESET_PHASE|PHASE_END,0,1)
-							end
-						end
-					end
+					Ritual.UseExtraLocationCountLimit(tc,e:GetHandler(),tp)
 				--------
 					local lv=(lv and (type(lv)=="function" and lv(tc)) or lv) or tc:GetLevel()
 					lv=math.max(1,lv)
