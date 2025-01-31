@@ -1,8 +1,11 @@
 --Worm Opera
 --Modified for CrimsonRemodels
+Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
-	--Special summon itself from hand
+	--Cannot be used as material for a monster from the Extra Deck, unless all other materials are "Worm" monsters
+	aux.XenoMatCheckOthers(c,s.matfilter)
+	--Change 1 face-down Defense Position on the field to face-up Attack Position, then Special Summon itself from your hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_POSITION+CATEGORY_SPECIAL_SUMMON)
@@ -12,31 +15,29 @@ function s.initial_effect(c)
 	e1:SetTarget(s.postg)
 	e1:SetOperation(s.posop)
 	c:RegisterEffect(e1)
-	--material limit
-	aux.XenoMatCheckOthers(c,s.matfilter)	
 end
 s.listed_series={SET_WORM}
 function s.matfilter(e,c)
 	return c:IsSetCard(SET_WORM)
 end
-
 function s.posfilter(c)
-	return c:IsFacedown() and c:IsDefensePos()
+	return c:IsFacedown() and c:IsDefensePos() and c:IsCanChangePosition()
 end
 function s.postg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingMatchingCard(s.posfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,nil,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.posop(e,tp,eg,ep,ev,re,r,rp,chk)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEDOWNDEFENSE)
 	local tc=Duel.SelectMatchingCard(tp,s.posfilter,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	if tc then
-		Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
+	if tc and Duel.ChangePosition(tc,POS_FACEUP_ATTACK)>0 and c:IsRelateToEffect(e) then
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+		Duel.BreakEffect()
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

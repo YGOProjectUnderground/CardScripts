@@ -1,87 +1,78 @@
 --Worm Rakuyeh
 --Modified for CrimsonRemodels
+Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
-	--pendulum summon
+	--Pendulum Summon
 	Pendulum.AddProcedure(c)
-	--splimit
+	--You cannot Special Summon monsters, except Reptile "Worm" monsters
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
+	e1:SetRange(LOCATION_PZONE)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(s.splimit)
+	c:RegisterEffect(e1)	
+	--Special Summon 1 Reptile "Worm" monster from your GY or banishment
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetRange(LOCATION_PZONE)
-	e2:SetTargetRange(1,0)
-	e2:SetTarget(s.splimit)
-	c:RegisterEffect(e2)	
-	--spsummon
+	e2:SetCode(EVENT_FLIP)
+	e2:SetCountLimit(1,id)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
+	c:RegisterEffect(e2)
+	--This card cannot attack unless you change 1 other monster you control to face-down Defense position
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,0))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e3:SetRange(LOCATION_PZONE)
-	e3:SetCode(EVENT_FLIP)
-	e3:SetCountLimit(1,id)
-	e3:SetCondition(s.spcon)
-	e3:SetTarget(s.sptg)
-	e3:SetOperation(s.spop)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_ATTACK_COST)
+	e3:SetCost(s.atcost)
+	e3:SetOperation(s.atop)
 	c:RegisterEffect(e3)
-	--attack cost
+	--Place this card in your Pendulum Zone
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_ATTACK_COST)
-	e4:SetCost(s.atcost)
-	e4:SetOperation(s.atop)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e4:SetCode(EVENT_LEAVE_FIELD)
+	e4:SetCountLimit(1,{id,1})
+	e4:SetCondition(s.pencon)
+	e4:SetTarget(s.pentg)
+	e4:SetOperation(s.penop)
 	c:RegisterEffect(e4)
-	--Place this card in the Pendulum Zone
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(id,3))
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e5:SetCode(EVENT_LEAVE_FIELD)
-	e5:SetCountLimit(1,{id,3})
-	e5:SetCondition(s.pencon)
-	e5:SetTarget(s.pentg)
-	e5:SetOperation(s.penop)
-	c:RegisterEffect(e5)
 end
-s.listed_series={0x3e}
+s.listed_series={SET_WORM}
 function s.splimit(e,c)
-	return not (c:IsSetCard(0x3e) and c:IsRace(RACE_REPTILE))
-end
-function s.cfilter(c,tp)
-	return true
-end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,tp)
+	return not (c:IsSetCard(SET_WORM) and c:IsRace(RACE_REPTILE))
 end
 function s.spfilter(c,e,tp)
-	return (c:IsSetCard(0x3e) and c:IsRace(RACE_REPTILE))
+	return c:IsSetCard(SET_WORM) and c:IsRace(RACE_REPTILE)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) 
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_GRAVE+LOCATION_REMOVED)
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_GRAVE|LOCATION_REMOVED)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_GRAVE|LOCATION_REMOVED,0,1,1,nil,e,tp)
 	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function s.facedown(c,e)
-	return c:IsFaceup() and c~=e:GetHandler()
-end
 function s.atcost(e,c,tp)
-	return Duel.IsExistingMatchingCard(s.facedown,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e)
+	return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,0,1,e:GetHandler())
 end
 function s.atop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsAttackCostPaid()~=2 and e:GetHandler():IsLocation(LOCATION_MZONE) then
+	local c=e:GetHandler()
+	if Duel.IsAttackCostPaid()~=2 and c:IsLocation(LOCATION_MZONE) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-		local tc=Duel.SelectMatchingCard(tp,s.facedown,tp,LOCATION_MZONE,0,1,1,nil,e):GetFirst()
+		local tc=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,c):GetFirst()
 		if tc then
 			Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)
 			Duel.AttackCostPaid()
