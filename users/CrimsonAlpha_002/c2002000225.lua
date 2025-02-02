@@ -1,13 +1,16 @@
 --Worm Ugly
 --Modified for CrimsonRemodels
+Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	Fusion.AddProcMixN(c,false,false,s.ffilter,2)
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,nil,aux.TRUE,1)
-	--special summon
+	--Cannot be used as material for a monster from the Extra Deck, unless all other materials are "Worm" monsters
+	aux.XenoMatCheckOthers(c,s.matfilter)
+	--Special Summon 1 Reptile "Worm" monster from your Deck
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,4))
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -24,8 +27,6 @@ function s.initial_effect(c)
 	e0:SetValue(s.valcheck)
 	e0:SetLabelObject(e1)
 	c:RegisterEffect(e0)
-	--material limit
-	aux.XenoMatCheckOthers(c,s.matfilter)	
 end
 s.listed_series={SET_WORM}
 function s.matfilter(e,c)
@@ -38,7 +39,7 @@ function s.contactfil(tp)
 	return Duel.GetReleaseGroup(tp)
 end
 function s.contactop(g)
-	Duel.Release(g,REASON_COST+REASON_MATERIAL)
+	Duel.Release(g,REASON_COST|REASON_MATERIAL)
 end
 function s.matval(c,sc)
 	local b
@@ -72,8 +73,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp):GetFirst()
 	if tc then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
