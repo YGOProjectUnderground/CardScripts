@@ -51,7 +51,7 @@ function s.spop(e, tp, eg, ep, ev, re, r, rp)
 	Duel.SendtoExtraP(eepy, nil, REASON_EFFECT)
 	Duel.SpecialSummon(c, 0, tp, tp, false, false, POS_FACEUP)
 	if
-		c:IsRelateToEffect(e) and Duel.IsExistingMatchingCard(s.handfilter, tp, 0, LOCATION_ONFIELD, 1, nil) and
+		Duel.IsExistingMatchingCard(s.handfilter, tp, 0, LOCATION_ONFIELD, 1, nil) and
 			Duel.SelectYesNo(tp, aux.Stringid(id, 0))
 	then
 		Duel.BreakEffect()
