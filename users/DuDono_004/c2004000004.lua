@@ -33,27 +33,27 @@ function s.handfilter(c)
 end
 function s.spcost(e, tp, eg, ep, ev, re, r, rp, chk)
 	if chk == 0 then
-		return Duel.IsExistingMatchingCard(Card.IsDiscardable, tp, LOCATION_HAND, 0, 1, e:GetHandler()) and
-			Duel.IsExistingMatchingCard(Card.IsCode, tp, LOCATION_DECK, 0, 1, nil, CARD_DREAMING_NEMLERIA)
+		return Duel.IsExistingMatchingCard(Card.IsDiscardable, tp, LOCATION_HAND, 0, 1, e:GetHandler())
 	end
-	local eepy = Duel.SelectMatchingCard(tp, Card.IsCode, tp, LOCATION_DECK, 0, 1, 1, nil, CARD_DREAMING_NEMLERIA)
 	Duel.DiscardHand(tp, Card.IsDiscardable, 1, 1, REASON_COST + REASON_DISCARD, e:GetHandler())
-	Duel.SendtoExtraP(eepy, nil, REASON_COST)
 end
 function s.sptg(e, tp, eg, ep, ev, re, r, rp, chk)
 	local c = e:GetHandler()
 	if chk == 0 then
-		return Duel.GetLocationCount(tp, LOCATION_MZONE) > 0 and c:IsCanBeSpecialSummoned(e, 0, tp, false, false)
+		return Duel.GetLocationCount(tp, LOCATION_MZONE) > 0 and c:IsCanBeSpecialSummoned(e, 0, tp, false, false) and
+		Duel.IsExistingMatchingCard(Card.IsCode, tp, LOCATION_DECK, 0, 1, nil, CARD_DREAMING_NEMLERIA)
 	end
 	Duel.SetOperationInfo(0, CATEGORY_SPECIAL_SUMMON, c, 1, tp, 0)
 end
 function s.spop(e, tp, eg, ep, ev, re, r, rp)
 	local c = e:GetHandler()
+	local eepy = Duel.SelectMatchingCard(tp, Card.IsCode, tp, LOCATION_DECK, 0, 1, 1, nil, CARD_DREAMING_NEMLERIA)
+	Duel.SendtoExtraP(eepy, nil, REASON_EFFECT)
+	Duel.SpecialSummon(c, 0, tp, tp, false, false, POS_FACEUP)
 	if
-		c:IsRelateToEffect(e) and Duel.SpecialSummon(c, 0, tp, tp, false, false, POS_FACEUP) > 0 and
-			Duel.IsExistingMatchingCard(s.handfilter, tp, 0, LOCATION_ONFIELD, 1, nil) and
+		Duel.IsExistingMatchingCard(s.handfilter, tp, 0, LOCATION_ONFIELD, 1, nil) and
 			Duel.SelectYesNo(tp, aux.Stringid(id, 0))
-	 then
+	then
 		Duel.BreakEffect()
 		local boom = Duel.SelectMatchingCard(tp, s.handfilter, tp, 0, LOCATION_ONFIELD, 1, 1, nil)
 		if Duel.SendtoHand(boom, nil, REASON_EFFECT) > 0 then
@@ -69,9 +69,9 @@ function s.prfilter2(c)
 	return c:IsFacedown() and c:IsAbleToRemoveAsCost(POS_FACEDOWN)
 end
 function s.prcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_EXTRA,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.prfilter2,tp,LOCATION_EXTRA,0,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_EXTRA,0,2,2,nil)
+	local g=Duel.SelectMatchingCard(tp,s.prfilter2,tp,LOCATION_EXTRA,0,2,2,nil)
 	Duel.Remove(g,POS_FACEDOWN,REASON_COST)
 end
 function s.prtg(e,tp,eg,ep,ev,re,r,rp,chk)

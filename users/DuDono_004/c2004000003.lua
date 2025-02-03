@@ -41,29 +41,29 @@ s.listed_series = {SET_NEMLERIA}
 
 function s.spcost(e, tp, eg, ep, ev, re, r, rp, chk)
 	if chk == 0 then
-		return Duel.IsExistingMatchingCard(Card.IsDiscardable, tp, LOCATION_HAND, 0, 1, e:GetHandler()) and
-			Duel.IsExistingMatchingCard(Card.IsCode, tp, LOCATION_DECK, 0, 1, nil, CARD_DREAMING_NEMLERIA)
+		return Duel.IsExistingMatchingCard(Card.IsDiscardable, tp, LOCATION_HAND, 0, 1, e:GetHandler())
 	end
-	local eepy = Duel.SelectMatchingCard(tp, Card.IsCode, tp, LOCATION_DECK, 0, 1, 1, nil, CARD_DREAMING_NEMLERIA)
 	Duel.DiscardHand(tp, Card.IsDiscardable, 1, 1, REASON_COST + REASON_DISCARD, e:GetHandler())
-	Duel.SendtoExtraP(eepy, nil, REASON_COST)
 end
 function s.sptg(e, tp, eg, ep, ev, re, r, rp, chk)
 	local c = e:GetHandler()
 	if chk == 0 then
-		return Duel.GetLocationCount(tp, LOCATION_MZONE) > 0 and c:IsCanBeSpecialSummoned(e, 0, tp, false, false)
+		return Duel.GetLocationCount(tp, LOCATION_MZONE) > 0 and c:IsCanBeSpecialSummoned(e, 0, tp, false, false) and
+		Duel.IsExistingMatchingCard(Card.IsCode, tp, LOCATION_DECK, 0, 1, nil, CARD_DREAMING_NEMLERIA)
 	end
 	Duel.SetOperationInfo(0, CATEGORY_SPECIAL_SUMMON, c, 1, tp, 0)
 end
 function s.spop(e, tp, eg, ep, ev, re, r, rp)
 	local c = e:GetHandler()
+	local eepy = Duel.SelectMatchingCard(tp, Card.IsCode, tp, LOCATION_DECK, 0, 1, 1, nil, CARD_DREAMING_NEMLERIA)
+	Duel.SendtoExtraP(eepy, nil, REASON_EFFECT)
+	Duel.SpecialSummon(c, 0, tp, tp, false, false, POS_FACEUP)
 	if
-		c:IsRelateToEffect(e) and Duel.SpecialSummon(c, 0, tp, tp, false, false, POS_FACEUP) > 0 and
-			Duel.IsExistingMatchingCard(c.IsDestructable, tp, 0, LOCATION_ONFIELD, 1, nil) and
+		Duel.IsExistingMatchingCard(Card.IsDestructable, tp, 0, LOCATION_ONFIELD, 1, nil) and
 			Duel.SelectYesNo(tp, aux.Stringid(id, 0))
-	 then
+	then
 		Duel.BreakEffect()
-		local boom = Duel.SelectMatchingCard(tp, c.IsDestructable, tp, 0, LOCATION_ONFIELD, 1, 1, nil)
+		local boom = Duel.SelectMatchingCard(tp, Card.IsDestructable, tp, 0, LOCATION_ONFIELD, 1, 1, nil)
 		if Duel.Destroy(boom, REASON_EFFECT) > 0 then
 			Duel.Draw(1 - tp, 1, REASON_EFFECT)
 		end
@@ -75,8 +75,7 @@ function s.cfilter(c)
 end
 function s.searchcost(e, tp, eg, ep, ev, re, r, rp, chk)
 	if chk == 0 then
-		return Duel.IsExistingMatchingCard(s.cfilter, tp, LOCATION_EXTRA, 0, 3, nil) and
-			Duel.GetCustomActivityCount(id, tp, ACTIVITY_SPSUMMON) == 0
+		return Duel.IsExistingMatchingCard(s.cfilter, tp, LOCATION_EXTRA, 0, 3, nil)
 	end
 	Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_REMOVE)
 	local g = Duel.SelectMatchingCard(tp, s.cfilter, tp, LOCATION_EXTRA, 0, 3, 3, nil)
@@ -90,6 +89,15 @@ function s.searchtg(e, tp, eg, ep, ev, re, r, rp, chk)
 		return Duel.IsExistingMatchingCard(s.thfilter, tp, LOCATION_DECK, 0, 1, nil)
 	end
 	Duel.SetOperationInfo(0, CATEGORY_TOHAND, nil, 1, tp, LOCATION_DECK)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(function(_,c) return c:IsLocation(LOCATION_EXTRA) and not c:IsType(TYPE_PENDULUM) end)
+	e1:SetReset(RESET_PHASE|PHASE_END)
+	Duel.RegisterEffect(e1,tp)
 end
 function s.searchop(e, tp, eg, ep, ev, re, r, rp)
 	local sg = Duel.SelectMatchingCard(tp, s.thfilter, tp, LOCATION_DECK, 0, 1, 1, nil)

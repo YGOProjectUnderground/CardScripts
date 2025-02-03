@@ -9,6 +9,10 @@ function s.initial_effect(c)
   c:RegisterEffect(e1)
   -- protect eepy girl
   local e2=Effect.CreateEffect(c)
+
+	e2:SetDescription(aux.Stringid(id,0))
+
+
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_IMMUNE_EFFECT)
 	e2:SetRange(LOCATION_SZONE)
@@ -47,6 +51,10 @@ function s.etarget(e,c)
 	return c:IsFaceup() and c:IsCode(CARD_DREAMING_NEMLERIA)
 end
 function s.efilter(e,re)
+
+	-- side note : Kashtira Unicorn can still try to banish Dreaming Nemleria, it just won't work.
+
+
 	return re:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
 
@@ -79,13 +87,15 @@ function s.bancfilter(c,tp)
 	return c:IsPreviousLocation(LOCATION_EXTRA) and c:IsPreviousControler(tp) and c:IsPosition(POS_FACEDOWN)
 end
 function s.bancon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.bancfilter,1,nil,tp) and ep==tp
+	return eg:IsExists(s.bancfilter,1,nil,rp) and rp==e:GetHandlerPlayer()
 end
 function s.rmfilter(c)
 	return c:IsAbleToRemove() and (c:IsLocation(LOCATION_SZONE) or aux.SpElimFilter(c,true,true))
 end
 function s.bantg(e,tp,eg,ep,ev,re,r,rp,chk)
-  if chk==0 then return Duel.IsExistingMatchingCard(s.rmfilter,tp,0,LOCATION_ONFIELD,1,nil) end
+  if chk==0 then 
+	return Duel.IsExistingMatchingCard(s.rmfilter,tp,0,LOCATION_ONFIELD,1,nil)
+  end
   local g=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
