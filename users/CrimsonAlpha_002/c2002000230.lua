@@ -4,7 +4,7 @@ Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	Fusion.AddProcMixRep(c,false,false,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_WORM),4,99,{2002000215,2002000221})
+	Fusion.AddProcMixRep(c,false,false,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_WORM),4,99,{10026986,81254059})
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,s.contactlim,aux.TRUE,s.contactzone)
 	--Gains 300 ATK/DEF for each Reptile "Worm" monster from your GY or banishment
 	local e1=Effect.CreateEffect(c)

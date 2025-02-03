@@ -4,7 +4,7 @@ Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Contact Fusion
-	Fusion.AddProcMixRep(c,false,false,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_WORM),2,2,2002000220)
+	Fusion.AddProcMixRep(c,false,false,aux.FilterBoolFunctionEx(Card.IsSetCard,SET_WORM),2,2,54860010)
 	Fusion.AddContactProc(c,s.contactfil,s.contactop,nil,aux.TRUE,1)
 	c:EnableReviveLimit()
 	--Negate the effects of 1 face-up monster your opponent controls, and if you do, destroy it
