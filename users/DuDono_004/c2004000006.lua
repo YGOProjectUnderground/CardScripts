@@ -9,7 +9,10 @@ function s.initial_effect(c)
   c:RegisterEffect(e1)
   -- protect eepy girl
   local e2=Effect.CreateEffect(c)
+
 	e2:SetDescription(aux.Stringid(id,0))
+
+
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_IMMUNE_EFFECT)
 	e2:SetRange(LOCATION_SZONE)
@@ -48,7 +51,10 @@ function s.etarget(e,c)
 	return c:IsFaceup() and c:IsCode(CARD_DREAMING_NEMLERIA)
 end
 function s.efilter(e,re)
+
 	-- side note : Kashtira Unicorn can still try to banish Dreaming Nemleria, it just won't work.
+
+
 	return re:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
 

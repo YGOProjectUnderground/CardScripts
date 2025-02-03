@@ -1,20 +1,20 @@
 --リチュアの氷魔鏡
---Gishki Icemirror
+--Gishki Nekromirror
 --scripted by pyrQ
---Modified for CrimsonAlpha
+--modified by Dikeido~ for The Underground
 Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activate
+	--Ritual Summon 1 Ritual Monster
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.operation)
+	e1:SetTarget(s.rittg)
+	e1:SetOperation(s.ritop)
 	c:RegisterEffect(e1)
-	--Return to the top and bottom of the Deck
+	--Place 1 "Gishki" monster in your GY on top of the Deck
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TODECK)
@@ -27,50 +27,33 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_GISHKI}
 function s.spfilter(c,e,tp)
+    if not c:IsLocation(LOCATION_HAND) then
+		local extra_loc_eff,used=Ritual.ExtraLocationOPTCheck(c,e:GetHandler(),tp)
+		if not extra_loc_eff or extra_loc_eff and used then return false end
+		if extra_loc_eff:GetProperty()&EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN>0 and Duel.HasFlagEffect(tp,EFFECT_FLAG_GAIN_ONLY_ONE_PER_TURN) then 
+			return false 
+		end
+	end
 	return c:IsRitualMonster() and c:IsSetCard(SET_GISHKI) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true)
 		and Duel.IsExistingMatchingCard(s.cfilter,tp,0,LOCATION_MZONE,1,nil,e,c)
 end
 function s.cfilter(c,e,sc)
 	return c:IsFaceup() and c:IsCanBeRitualMaterial(sc) and not c:IsImmuneToEffect(e)
 end
---- Custom ---
-function s.chkritloc(e,tp)
-	local location=LOCATION_HAND
-	local ec=Duel.IsExistingMatchingCard(s.spfilter,tp,location,0,1,nil,e,tp)
-	local extra_loc=Duel.GetFlagEffectLabel(tp,CUSTOM_RITUAL_LOCATION)
-	local ec_extra
-	if extra_loc and (location&extra_loc)==0 then
-		ec_extra=Duel.IsExistingMatchingCard(s.spfilter,tp,extra_loc,0,1,nil,e,tp)
-		if ec_extra and ec then
-			location = location+extra_loc
-		elseif ec_extra and not ec then
-			location = extra_loc
-		end
-	end
-	return location
-end
---------------
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.rittg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rparams={filter=aux.FilterBoolFunction(Card.IsSetCard,SET_GISHKI),lvtype=RITPROC_EQUAL,stage2=s.stage2}
 	local rittg=Ritual.Target(rparams)
-	--- Custom ---
-	local location=s.chkritloc(e,tp)
-	--------------
 	if chk==0 then 
 		return (Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
-		    and Duel.IsExistingMatchingCard(s.spfilter,tp,location,0,1,nil,e,tp))
-			 or rittg(e,tp,eg,ep,ev,re,r,rp,chk) 
+			and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_NOTHAND,0,1,nil,e,tp))
+			or rittg(e,tp,eg,ep,ev,re,r,rp,chk) 
 	end
 	rittg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
-
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	--- Custom ---
-	local location=s.chkritloc(e,tp)
-	--------------
+function s.ritop(e,tp,eg,ep,ev,re,r,rp)
 	local rparams={filter=aux.FilterBoolFunction(Card.IsSetCard,SET_GISHKI),lvtype=RITPROC_EQUAL,stage2=s.stage2}
 	local rittg,ritop=Ritual.Target(rparams),Ritual.Operation(rparams)
-	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,location,0,1,nil,e,tp)
+	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_NOTHAND,0,1,nil,e,tp)
 	local b2=rittg(e,tp,eg,ep,ev,re,r,rp,0)
 	if not (b1 or b2) then return end
 	local op=Duel.SelectEffect(tp,
@@ -78,26 +61,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		{b2,aux.Stringid(id,3)})
 	if op==1 then
 		--Tribute 1 opponent's face-up monster
-		--- Custom ---
-		local location=LOCATION_HAND
-		local extra_loc=Duel.GetFlagEffectLabel(tp,CUSTOM_RITUAL_LOCATION)
-		local ec=Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp)
-		ec_extra=nil
-		if Duel.GetFlagEffect(tp,CUSTOM_RITUAL_LOCATION)==1 and extra_loc and (location&extra_loc)==0 then
-			ec_extra=Duel.IsExistingMatchingCard(s.spfilter,tp,extra_loc,0,1,nil,e,tp)
-			if ec_extra and ec then
-				if Duel.SelectYesNo(tp,aux.Stringid(CUSTOM_RITUAL_LOCATION,1)) then
-					Duel.RegisterFlagEffect(tp,CUSTOM_RITUAL_LOCATION,RESET_PHASE+PHASE_END,0,1,extra_loc)
-					location = extra_loc
-				end
-			elseif ec_extra and not ec then
-				Duel.RegisterFlagEffect(tp,CUSTOM_RITUAL_LOCATION,RESET_PHASE+PHASE_END,0,1,extra_loc)
-				location = extra_loc
-			end
-		end
-		--------------		
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)	
-		local sc=Duel.SelectMatchingCard(tp,s.spfilter,tp,location,0,1,1,nil,e,tp):GetFirst()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_HAND|LOCATION_NOTHAND,0,1,1,nil,e,tp):GetFirst()
 		if not sc then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local rg=Duel.SelectMatchingCard(tp,s.cfilter,tp,0,LOCATION_MZONE,1,1,nil,e,sc)
@@ -107,6 +72,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		if Duel.SpecialSummon(sc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)==0 then return end
 		sc:CompleteProcedure()
+		Ritual.UseExtraLocationCountLimit(sc,e:GetHandler(),tp)
 		Duel.SetLP(tp,Duel.GetLP(tp)-sc:GetBaseAttack())
 	elseif op==2 then
 		--Tribute monsters from your hand or field
@@ -128,12 +94,12 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g+c,2,tp,0)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_DECK|LOCATION_EXTRA) then
-		Duel.ConfirmDecktop(tp,1)
-		if c:IsRelateToEffect(e) then
-			Duel.SendtoDeck(c,nil,SEQ_DECKBOTTOM,REASON_EFFECT)
-		end
+	if not (tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,SEQ_DECKTOP,REASON_EFFECT)>0
+		and tc:IsLocation(LOCATION_DECK|LOCATION_EXTRA)) then return end
+	if tc:IsLocation(LOCATION_DECK) then Duel.ConfirmDecktop(tp,1) end
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.SendtoDeck(c,nil,SEQ_DECKBOTTOM,REASON_EFFECT)
 	end
 end

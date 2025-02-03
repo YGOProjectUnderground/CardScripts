@@ -27,9 +27,50 @@ function s.initial_effect(c)
   e3:SetTarget(s.thtg)
   e3:SetOperation(s.thop)
   c:RegisterEffect(e3)
+  -- protect from negation
+  local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_CANNOT_DISEFFECT)
+  e4:SetRange(LOCATION_FZONE)
+  e4:SetValue(s.negfilter)
+	c:RegisterEffect(e4)
+  local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD)
+	e5:SetCode(EFFECT_CANNOT_DISABLE)
+  e5:SetRange(LOCATION_FZONE)
+	e5:SetTargetRange(LOCATION_ONFIELD,LOCATION_ONFIELD)
+	e5:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e5:SetTarget(s.negfilter2)
+	c:RegisterEffect(e5)
+  -- Count banish
+	aux.GlobalCheck(s,function()
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_REMOVE)
+		ge1:SetOperation(s.checkop)
+		Duel.RegisterEffect(ge1,0)
+	end)
 end
 s.listed_series={SET_NEMLERIA}
 s.listed_names={CARD_DREAMING_NEMLERIA}
+
+function s.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	for tc in aux.Next(eg) do
+    if tc:GetOwner() == rp then
+		  Duel.RegisterFlagEffect(rp,id,RESET_PHASE|PHASE_END,0,1)
+    end
+	end
+end
+function s.negfilter(e,ct)
+  local te = Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
+  local tc = te:GetHandler()
+  local p = tc:GetControler()
+  return Duel.GetFlagEffect(p,id) >= 5 and tc:IsLocation(LOCATION_ONFIELD)
+end
+function s.negfilter2(e,c)
+	return Duel.GetFlagEffect(c:GetControler(),id) >= 5
+end
 
 function s.extg(e,tp,eg,ep,ev,re,r,rp,chk)
   local ct = Duel.GetMatchingGroupCount(Card.IsFacedown,0,LOCATION_REMOVED,0,nil)
