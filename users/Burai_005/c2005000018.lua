@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	e1:SetCost(s.poscost)
 	e1:SetTarget(s.postg)
 	e1:SetOperation(s.posop)
-	c:RegisterEffect(e1)
+	c:RegisterEffect(e1,false,CUSTOM_REGISTER_FLIP)
 	--Special Summon 1 "lswarm"
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
