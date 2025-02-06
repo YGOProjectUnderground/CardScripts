@@ -1,82 +1,99 @@
---Ancestralight Dragon
-Duel.LoadScript("_load_.lua")
+-- ハロウフォール・プロテクター
+-- Hallowfall Protector
 local s,id=GetID()
 function s.initial_effect(c)
-	--Fusion
+	--Pendulum Summon
+	Pendulum.AddProcedure(c)
 	c:EnableReviveLimit()
+	--Must be Special Summoned from Pendulum Zone
+    local e0=Effect.CreateEffect(c)
+    e0:SetType(EFFECT_TYPE_SINGLE)
+    e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+    e0:SetCode(EFFECT_SPSUMMON_CONDITION)
+    e0:SetValue(s.splimit)
+    c:RegisterEffect(e0)
+
+	--Pendulum Effect: Special Summon and banish battling monster
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_REMOVE)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_BATTLE_START)
+	e1:SetRange(LOCATION_PZONE)
+	e1:SetCountLimit(1,id)
+	e1:SetCondition(s.spcon)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
+	c:RegisterEffect(e1)
 	
-	--Set from banished and destroy on Special Summon
+	--Special Summon from GY
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_DESTROY)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCountLimit(1,id)
-	e2:SetTarget(s.settg)
-	e2:SetOperation(s.setop)
+	e2:SetCountLimit(1,{id,1})
+	e2:SetTarget(s.gytg)
+	e2:SetOperation(s.gyop)
 	c:RegisterEffect(e2)
-	
-	--Banish from GY to add to hand
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCountLimit(1,id)
-	e3:SetCost(aux.bfgcost)
-	e3:SetTarget(s.thtg)
-	e3:SetOperation(s.thop)
-	c:RegisterEffect(e3)
 end
 s.listed_series={0x77b}
 
-function s.setfilter(c)
-	return c:IsSetCard(0x77b) and c:IsSpellTrap() and c:IsFaceup() and c:IsSSetable()
- end
- 
- function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
-		if ft<0 then return false end
-		local g=Duel.GetMatchingGroup(s.setfilter,tp,LOCATION_REMOVED,0,nil)
-		return #g>0 and (ft>0 or g:IsExists(Card.IsType,1,nil,TYPE_FIELD))
-	end
- end
- 
- function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
-	if ft<0 then return end
-	
-	local g=Duel.GetMatchingGroup(s.setfilter,tp,LOCATION_REMOVED,0,nil)
-	local sg=aux.SelectUnselectGroup(g,e,tp,1,math.min(99,ft),aux.dncheck,1,tp,HINTMSG_SET)
-	
-	if #sg>0 and Duel.SSet(tp,sg)>0 then
-		local ct=sg:FilterCount(Card.IsLocation,nil,LOCATION_ONFIELD)
-		local dg=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
-		if ct>0 and #dg>0 then
-			Duel.BreakEffect()
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-			local sg2=dg:Select(tp,ct,ct,nil)
-			Duel.Destroy(sg2,REASON_EFFECT)
-		end
-	end
- end
-
-function s.thfilter(c)
-	return c:IsSetCard(0x77b) and c:IsMonster() and c:IsAbleToHand()
+--Special Summon limit
+function s.splimit(e,se,sp,st)
+    return se:GetHandler()==e:GetHandler() and se:GetOwner()==e:GetOwner()
 end
 
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+    local a=Duel.GetAttacker()
+    local d=Duel.GetAttackTarget()
+    if not d then 
+        return false 
+    end
+    if d:IsControler(tp) then a,d=d,a end
+    e:SetLabelObject(d)
+    local result = a:IsSetCard(0x77b) and a:IsType(TYPE_SYNCHRO)
+    return result
 end
 
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	if #g>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+    local c=e:GetHandler()
+    local tc=e:GetLabelObject()
+    local canSummon = Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,true,true)
+    if chk==0 then return canSummon
+        and tc and tc:IsAbleToRemove() end
+    Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+    Duel.SetOperationInfo(0,CATEGORY_REMOVE,tc,1,0,0)
+end
+
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+    local c=e:GetHandler()
+    local tc=e:GetLabelObject()
+    if c:IsRelateToEffect(e) then
+        local success = Duel.SpecialSummon(c,0,tp,tp,true,true,POS_FACEUP)
+        if success>0 and tc and tc:IsRelateToBattle() then
+            Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
+        end
+    end
+end
+
+function s.gyfilter(c,e,tp)
+	return c:IsSetCard(0x77b) and c:IsType(TYPE_SYNCHRO) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+
+function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.gyfilter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(s.gyfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectTarget(tp,s.gyfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+end
+
+function s.gyop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 	end
 end
