@@ -1,5 +1,6 @@
 -- ハロウフォール・パスウェイ 
 -- Hallowfall Pathway
+Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
     --Add to hand

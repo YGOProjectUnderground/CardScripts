@@ -1,5 +1,6 @@
 --虐殺の母 
 --Hallow Mother of Abominations
+Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
     c:EnableReviveLimit()
