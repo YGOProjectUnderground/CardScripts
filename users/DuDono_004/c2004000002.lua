@@ -78,11 +78,12 @@ function s.spdkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.tgcfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,1,1,c)
-	if Duel.SendtoGrave(g,REASON_COST) then
+	if #g==0 then return end
+	if Duel.SendtoGrave(g,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_GRAVE) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,s.spdkfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-		if #g>0 then
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+		local sg=Duel.SelectMatchingCard(tp,s.spdkfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+		if #sg>0 then
+			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end
