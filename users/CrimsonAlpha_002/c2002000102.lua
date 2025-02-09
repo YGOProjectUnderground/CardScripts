@@ -1,4 +1,4 @@
- --Apoqliphort Administrator
+--Apoqliphort Administrator
 Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
@@ -15,12 +15,13 @@ function s.initial_effect(c)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(s.splimit)
 	c:RegisterEffect(e1)
-	--tohand
+	--Add 1 "Qliphort" card from your Deck to your hand, except "Apoqliphort Administrator"
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_PZONE)
-	e2:SetCountLimit(1,{id,0})
+	e2:SetCountLimit(1,id)
 	e2:SetCondition(s.thcon)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
@@ -32,17 +33,17 @@ function s.initial_effect(c)
 	e3:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e3:SetValue(s.ritlimit)
 	c:RegisterEffect(e3)
-	--special summon proc
+	--Special Summon itself (from your face-up Extra Deck) by Tribuing 3 "Qli" monsters
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetCode(EFFECT_SPSUMMON_PROC)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e4:SetRange(LOCATION_EXTRA)
-	e4:SetCondition(s.hspcon)
-	e4:SetTarget(s.hsptg)
-	e4:SetOperation(s.hspop)
+	e4:SetCondition(s.exspcon)
+	e4:SetTarget(s.exsptg)
+	e4:SetOperation(s.exspop)
 	c:RegisterEffect(e4)
-	--immune
+	--Unaffected by other card effects
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
@@ -51,31 +52,33 @@ function s.initial_effect(c)
 	e5:SetCondition(s.econ)
 	e5:SetValue(s.efilter)
 	c:RegisterEffect(e5)
-	--summon qliphort genius
+	--Place this card to your opponent's Pendulum Zone
 	local e6=Effect.CreateEffect(c)
-	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e6:SetCode(EVENT_DESTROYED)
-	e6:SetProperty(EFFECT_FLAG_DELAY)
+	e6:SetDescription(aux.Stringid(id,1))
+	e6:SetType(EFFECT_TYPE_QUICK_O)
+	e6:SetCode(EVENT_FREE_CHAIN)
+	e6:SetRange(LOCATION_MZONE)
+	e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e6:SetCountLimit(1,{id,1})
-	e6:SetCondition(s.sscon)
-	e6:SetTarget(s.sstg)
-	e6:SetOperation(s.ssop)
+	e6:SetCondition(s.pccon)
+	e6:SetTarget(s.pctg)
+	e6:SetOperation(s.pcop)
 	c:RegisterEffect(e6)
-	--pendulum set
+	--Special Summon 1 "Qliphort Genius" from your Extra Deck
 	local e7=Effect.CreateEffect(c)
-	e7:SetType(EFFECT_TYPE_QUICK_O)
-	e7:SetCode(EVENT_FREE_CHAIN)
-	e7:SetRange(LOCATION_MZONE)
-	e7:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e7:SetDescription(aux.Stringid(id,2))
+	e7:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e7:SetCode(EVENT_DESTROYED)
+	e7:SetProperty(EFFECT_FLAG_DELAY)
 	e7:SetCountLimit(1,{id,2})
-	e7:SetCondition(s.pccon)
-	e7:SetTarget(s.pctg)
-	e7:SetOperation(s.pcop)
+	e7:SetCondition(s.sscon)
+	e7:SetTarget(s.sstg)
+	e7:SetOperation(s.ssop)
 	c:RegisterEffect(e7)
 end
 s.listed_series={SET_QLI}
-s.listed_names={22423493}
+s.listed_names={22423493,id}
 -- {Special Summon Restriction: Qli}
 function s.splimit(e,c,tp,sumtp,sumpos)
 	return not c:IsSetCard(SET_QLI)
@@ -84,14 +87,14 @@ end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,e:GetHandler(),SET_QLI)
 end
-function s.filter(c)
+function s.thfilter(c)
 	return c:IsSetCard(SET_QLI) and not c:IsCode(id) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil) end
 	local g=Duel.GetFieldGroup(tp,LOCATION_PZONE,0)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK|LOCATION_GRAVE)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -100,7 +103,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if #dg<2 then return end
 	if Duel.Destroy(dg,REASON_EFFECT)~=2 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,1,nil)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
@@ -110,39 +113,30 @@ end
 function s.ritlimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
 end
--- {Special Summon Proc: Summon from the Extra Deck}
-function s.chk(c,sg)
-	return c:IsSetCard(SET_QLI)
+function s.rescon(sg,tp,exg,e)
+	return Duel.GetLocationCountFromEx(tp,tp,sg,e:GetHandler())>0
 end
-function s.rescon(sg,e,tp,mg)
-	return aux.ChkfMMZ(1)(sg,e,tp,mg) 
-		and sg:IsExists(s.chk,1,nil,sg)
-		and (not e:GetHandler():IsLocation(LOCATION_EXTRA) or Duel.GetLocationCountFromEx(tp,tp,sg,e:GetHandler())>0)
+function s.releasefilter(c,e,tp)
+	return c:IsMonster() and c:IsSetCard(SET_QLI) and c:IsFaceup() 
 end
-function s.hspfilter(c,e,tp)
-	return c:IsSetCard(SET_QLI) and c:IsFaceup() 
-end
-function s.hspcon(e,c)
+function s.exspcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local rg=Duel.GetReleaseGroup(tp):Filter(s.hspfilter,nil)
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-3 and #rg>2
-		and aux.SelectUnselectGroup(rg,e,tp,3,3,s.rescon,0)
+	return Duel.CheckReleaseGroupCost(tp,s.releasefilter,3,3,false,s.rescon,nil,e)
 end
-function s.hsptg(e,tp,eg,ep,ev,re,r,rp,c)
-	local rg=Duel.GetReleaseGroup(tp):Filter(s.hspfilter,nil)
-	local mg1=aux.SelectUnselectGroup(rg,e,tp,3,3,s.rescon,1,tp,HINTMSG_RELEASE,nil,nil,true)
-	if #mg1>2 then
-		mg1:KeepAlive()
-		e:SetLabelObject(mg1)
+function s.exsptg(e,tp,eg,ep,ev,re,r,rp,c)
+	local sg=Duel.SelectReleaseGroupCost(tp,s.releasefilter,3,3,false,s.rescon,nil,e)
+	if #sg>2 then
+		sg:KeepAlive()
+		e:SetLabelObject(sg)
 		return true
 	end
 	return false
 end
-function s.hspop(e,tp,eg,ep,ev,re,r,rp,c)
+function s.exspop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	if not g then return end
-	Duel.Release(g,REASON_COST+REASON_MATERIAL)
+	Duel.Release(g,REASON_COST|REASON_MATERIAL)
 	g:DeleteGroup()
 end
 -- {Monster Effect: Immunity}
@@ -155,44 +149,22 @@ end
 --{Monster Effect: Special Summon 'Qliphort Genius'}
 function s.sscon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:IsPreviousLocation(LOCATION_ONFIELD) 
+	return c:IsReason(REASON_BATTLE|REASON_EFFECT) and c:IsPreviousLocation(LOCATION_ONFIELD) 
 end
 function s.ssfilter(c,e,tp)
-	return c:IsCode(22423493) 
-	   and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsCode(22423493) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_LINK,tp,false,false,POS_FACEUP,tp,0x60)
 end
 function s.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetCode(EFFECT_FORCE_MZONE)
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e1:SetTargetRange(1,0)
-		e1:SetValue(96)
-		Duel.RegisterEffect(e1,tp)
-		local res=Duel.GetLocationCountFromEx(tp,tp,e:GetHandler())>0
-			and Duel.IsExistingMatchingCard(s.ssfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
-		e1:Reset()
-		return res
-	end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.ssfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.ssop(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_FORCE_MZONE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTargetRange(1,0)
-	e1:SetValue(96)
-	Duel.RegisterEffect(e1,tp)
-	if Duel.GetLocationCountFromEx(tp)>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,s.ssfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-		if #g>0 then
-			Duel.SpecialSummon(g,SUMMON_TYPE_LINK,tp,tp,false,false,POS_FACEUP)
-		end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,s.ssfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
+	if #g>0 then
+		Duel.SpecialSummon(g,SUMMON_TYPE_LINK,tp,tp,false,false,POS_FACEUP)
 	end
-	e1:Reset() 
 end
 --{Monster Effect: Place in Pendulum Zone}
 function s.pccon(e,tp,eg,ep,ev,re,r,rp)
