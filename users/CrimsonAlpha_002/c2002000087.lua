@@ -58,7 +58,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_XYZ_LEVEL)
 			e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-			e1:SetValue(g:GetFirst():GetRank())
+			e1:SetValue(tc:GetRank())
 			e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
 			c:RegisterEffect(e1)
 			--negate effects
@@ -69,8 +69,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.sumop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local e0=aux.createTempLizardCheck(c)
-	e0:SetCondition(s.spcon)
+	local e0=aux.createTempLizardCheck(c,function(sc) return not sc:IsOrignalType(TYPE_LINK) end)
+	e0:SetCondition(s.splimitcon)
 	Duel.RegisterEffect(e0,tp)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
@@ -78,12 +78,10 @@ function s.sumop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
 	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e2:SetReset(RESET_PHASE|PHASE_END)
-	e2:SetOwnerPlayer(tp)
 	e2:SetCondition(s.splimitcon)
 	e2:SetTargetRange(1,0)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsOriginalType,TYPE_LINK))
 	Duel.RegisterEffect(e2,tp)
-	--lizard check with a reset
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -92,7 +90,7 @@ function s.sumop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e3,tp)
 end
 function s.splimitcon(e)
-	return Duel.GetFlagEffect(e:GetOwnerPlayer(),id)>0
+	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)>0
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if eg:IsExists(Card.IsOriginalType,1,nil,TYPE_LINK) then
