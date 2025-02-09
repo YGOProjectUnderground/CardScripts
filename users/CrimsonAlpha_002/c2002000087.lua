@@ -32,7 +32,7 @@ function s.rvcostfilter(c,e,tp)
 	return c:IsMonster() and c:IsType(TYPE_XYZ) and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,c,e,tp)
 end
 function s.linkcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK) end
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.rvcostfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
