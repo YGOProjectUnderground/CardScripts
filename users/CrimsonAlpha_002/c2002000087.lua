@@ -4,7 +4,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsType,TYPE_EFFECT),2,2)
-	--Special Summon 1 monster from your Deck
+	--Special Summon 1 "Constellar" or "tellarknight" monster from your Deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -16,6 +16,13 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
+	--Can only Special Summon Link Monsters once for the rest of this turn
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCondition(s.spcon)
+	e2:SetOperation(s.sumop)
+	c:RegisterEffect(e2)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
@@ -63,4 +70,36 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummonComplete()
 	end
 	
+end
+function s.sumop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local e0=aux.createTempLizardCheck(c)
+	e0:SetCondition(s.spcon)
+	Duel.RegisterEffect(e0,tp)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	e2:SetOwnerPlayer(tp)
+	e2:SetCondition(s.splimitcon)
+	e2:SetTargetRange(1,0)
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsOriginalType,TYPE_LINK))
+	Duel.RegisterEffect(e2,tp)
+	--lizard check with a reset
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetOperation(s.checkop)
+	e3:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e3,tp)
+end
+function s.splimitcon(e)
+	return Duel.GetFlagEffect(e:GetOwnerPlayer(),id)>0
+end
+function s.checkop(e,tp,eg,ep,ev,re,r,rp)
+	if eg:IsExists(Card.IsOriginalType,1,nil,TYPE_LINK) then
+		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+	end
 end

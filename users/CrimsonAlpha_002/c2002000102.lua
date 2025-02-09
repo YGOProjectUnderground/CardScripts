@@ -1,9 +1,4 @@
  --Apoqliphort Administrator
- --[ Pendulum Effect ]
- --You cannot Special Summon monsters, except for "Qli" monsters. This effect cannot be negated. If you have another "Qli" card in your other Pendulum Zone: You can destroy both cards in your Pendulum Zones, and if you do, add 1 "Qli" card from your Deck or GY, except "Apoqliphort Administrator".
- ----------------------------------------
---[ Monster Effect ]
---You can Ritual Summon this card using "Apoqliphort Advent". Must either be Ritual Summoned, or Special Summoned (from your face-up Extra Deck) by Tributing 3 "Qli" monsters. You can only Special Summon "Apoqliphort Administrator(s)" once per turn. Unaffected by other card's effects. (Quick Effect): You can place this card in your opponent's Pendulum Zone, but destroy it during the End Phase. If this card on the field is destroyed by battle or card effect: You can Special Summon 1 "Qliphort Genius" from your Extra Deck to the Extra Monster Zone. (This is treated as a Link Summon.)
 Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
@@ -38,58 +33,59 @@ function s.initial_effect(c)
 	e3:SetValue(s.ritlimit)
 	c:RegisterEffect(e3)
 	--special summon proc
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_SPSUMMON_PROC)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e2:SetRange(LOCATION_EXTRA)
-	e2:SetCondition(s.hspcon)
-	e2:SetTarget(s.hsptg)
-	e2:SetOperation(s.hspop)
-	c:RegisterEffect(e2)
-	--immune
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_IMMUNE_EFFECT)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCondition(s.econ)
-	e3:SetValue(s.efilter)
-	c:RegisterEffect(e3)
-	--summon qliphort genius
 	local e4=Effect.CreateEffect(c)
-	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_DESTROYED)
-	e4:SetProperty(EFFECT_FLAG_DELAY)
-	e4:SetCountLimit(1,{id,1})
-	e4:SetCondition(s.sscon)
-	e4:SetTarget(s.sstg)
-	e4:SetOperation(s.ssop)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_SPSUMMON_PROC)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e4:SetRange(LOCATION_EXTRA)
+	e4:SetCondition(s.hspcon)
+	e4:SetTarget(s.hsptg)
+	e4:SetOperation(s.hspop)
 	c:RegisterEffect(e4)
-	--pendulum set
+	--immune
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_QUICK_O)
-	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_IMMUNE_EFFECT)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e5:SetCountLimit(1,{id,2})
-	e5:SetTarget(s.pctg)
-	e5:SetOperation(s.pcop)
+	e5:SetCondition(s.econ)
+	e5:SetValue(s.efilter)
 	c:RegisterEffect(e5)
+	--summon qliphort genius
+	local e6=Effect.CreateEffect(c)
+	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e6:SetCode(EVENT_DESTROYED)
+	e6:SetProperty(EFFECT_FLAG_DELAY)
+	e6:SetCountLimit(1,{id,1})
+	e6:SetCondition(s.sscon)
+	e6:SetTarget(s.sstg)
+	e6:SetOperation(s.ssop)
+	c:RegisterEffect(e6)
+	--pendulum set
+	local e7=Effect.CreateEffect(c)
+	e7:SetType(EFFECT_TYPE_QUICK_O)
+	e7:SetCode(EVENT_FREE_CHAIN)
+	e7:SetRange(LOCATION_MZONE)
+	e7:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e7:SetCountLimit(1,{id,2})
+	e7:SetCondition(s.pccon)
+	e7:SetTarget(s.pctg)
+	e7:SetOperation(s.pcop)
+	c:RegisterEffect(e7)
 end
-s.listed_series={0xaa}
+s.listed_series={SET_QLI}
 s.listed_names={22423493}
 -- {Special Summon Restriction: Qli}
 function s.splimit(e,c,tp,sumtp,sumpos)
-	return not c:IsSetCard(0xaa)
+	return not c:IsSetCard(SET_QLI)
 end
 -- {Pendulum Effect: Search}
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,e:GetHandler(),0xaa)
+	return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,e:GetHandler(),SET_QLI)
 end
 function s.filter(c)
-	return c:IsSetCard(0xaa) and not c:IsCode(id) and c:IsAbleToHand()
+	return c:IsSetCard(SET_QLI) and not c:IsCode(id) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
@@ -116,7 +112,7 @@ function s.ritlimit(e,se,sp,st)
 end
 -- {Special Summon Proc: Summon from the Extra Deck}
 function s.chk(c,sg)
-	return c:IsSetCard(0xaa)
+	return c:IsSetCard(SET_QLI)
 end
 function s.rescon(sg,e,tp,mg)
 	return aux.ChkfMMZ(1)(sg,e,tp,mg) 
@@ -124,7 +120,7 @@ function s.rescon(sg,e,tp,mg)
 		and (not e:GetHandler():IsLocation(LOCATION_EXTRA) or Duel.GetLocationCountFromEx(tp,tp,sg,e:GetHandler())>0)
 end
 function s.hspfilter(c,e,tp)
-	return c:IsSetCard(0xaa) and c:IsFaceup() 
+	return c:IsSetCard(SET_QLI) and c:IsFaceup() 
 end
 function s.hspcon(e,c)
 	if c==nil then return true end
@@ -199,35 +195,19 @@ function s.ssop(e,tp,eg,ep,ev,re,r,rp)
 	e1:Reset() 
 end
 --{Monster Effect: Place in Pendulum Zone}
+function s.pccon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsPhase(PHASE_MAIN1)
+end
 function s.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return (Duel.CheckLocation(1-tp,LOCATION_PZONE,0) or Duel.CheckLocation(1-tp,LOCATION_PZONE,1)) end
 end
 function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	local phase=PHASE_END
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if not Duel.CheckLocation(1-tp,LOCATION_PZONE,0) and not Duel.CheckLocation(1-tp,LOCATION_PZONE,1) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	Duel.MoveToField(c,tp,1-tp,LOCATION_PZONE,POS_FACEUP,true)
-	local fid=e:GetHandler():GetFieldID()
-	c:RegisterFlagEffect(id,RESET_EVENT+0x1fe0000,0,1,fid)
-	local r1=Effect.CreateEffect(e:GetHandler())
-		r1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		r1:SetCode(EVENT_PHASE+PHASE_END)
-		r1:SetCountLimit(1)
-		r1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		r1:SetLabel(fid)
-		r1:SetLabelObject(c)
-		r1:SetCondition(s.descon)
-		r1:SetOperation(s.desop)
-	Duel.RegisterEffect(r1,tp)
-end
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	if tc:GetFlagEffectLabel(id)~=e:GetLabel() then
-		e:Reset()
-		return false
-	else return true end
-end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetLabelObject(),REASON_EFFECT)
+	aux.DelayedOperation(c,PHASE_BATTLE,id,e,tp,function(cc) Duel.Destroy(cc,REASON_EFFECT) end,nil,nil,1,aux.Stringid(id,1))
+	aux.DelayedOperation(c,PHASE_END,id,e,tp,function(cc) Duel.Destroy(cc,REASON_EFFECT) end,nil,nil,1,aux.Stringid(id,1))
 end
