@@ -347,6 +347,70 @@ function Auxiliary.NekrozOuroCheck(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsPlayerAffectedByEffect(tp,CARD_NEKROZ_OUROBOROS)
 end
 
+function Auxiliary.IsEquippedByItself(effect)
+	local c=effect:GetHandler()
+	return c:IsHasEffect(EFFECT_EQUIPPED_ITSELF)
+end
+
+local function GrayCheckOP(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():IsDisabled() or not aux.IsEquippedByItself(e) then
+		e:SetLabel(1)
+	else e:SetLabel(0) end
+end
+local function GrayDesOP(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetLabelObject():GetLabel()~=0 then return end
+	local tc=e:GetHandler():GetEquipTarget()
+	if tc and tc:IsLocation(LOCATION_MZONE) then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
+end
+function Auxiliary.GraydleEffect(c)
+	--control
+	local eq1=Effect.CreateEffect(c)
+	eq1:SetType(EFFECT_TYPE_EQUIP)
+	eq1:SetCode(EFFECT_SET_CONTROL)
+	eq1:SetCondition(aux.IsEquippedByItself)
+	eq1:SetValue(function(e) return e:GetHandlerPlayer() end)
+	c:RegisterEffect(eq1)
+	local eq2=Effect.CreateEffect(c)
+	eq2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	eq2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	eq2:SetCode(EVENT_LEAVE_FIELD_P)
+	eq2:SetOperation(GrayCheckOP)
+	c:RegisterEffect(eq2)
+	local eq3=Effect.CreateEffect(c)
+	eq3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	eq3:SetCode(EVENT_LEAVE_FIELD)
+	eq3:SetOperation(GrayDesOP)
+	eq3:SetLabelObject(eq2)
+	c:RegisterEffect(eq3)
+end
+
+function Auxiliary.EquipGraydle(c,e,tp,tc)
+	local xa=tc:GetControler()~=e:GetHandler():GetControler()
+	local xb=aux.CheckStealEquip(tc,e,tp)
+	if not((xa and xb) or (not xa or not xb)) then return end
+	if Duel.Equip(tp,c,tc,true) then 
+		--Add Equip limit
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetValue(function(e,c) return c==e:GetLabelObject() end)
+		e1:SetLabelObject(tc)
+		c:RegisterEffect(e1)
+		--Set flag
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_EQUIPPED_ITSELF)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		c:RegisterEffect(e2)
+		return true
+	end
+end
+
 local Azurist={}
 
 function Azurist.registerflag(id)
