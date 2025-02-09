@@ -9,9 +9,9 @@ They are automatically synchronized with servers.
 
 ## Contributing
 
-Please keep all bug reports and questions on Discord; do NOT open an issue or pull request for this purpose.
+Please keep all bug reports and questions on [Discord](https://discord.gg/NwPa6mwyYx); do **NOT** open an issue or pull request for this purpose.
 
-Reach out to us on Discord to learn how to contribute and start scripting! Before opening a pull request, please speak with a member of staff in `#card-scripting` first and read [`CONTRIBUTING.md`](https://github.com/YGOProjectUnderground/CardScripts/blob/master/CONTRIBUTING.md).
+Reach out to us on [Discord](https://discord.gg/NwPa6mwyYx) to learn how to contribute and start scripting! Before opening a pull request, please speak with a member of staff in `#card-scripting` first and read [`CONTRIBUTING.md`](https://github.com/YGOProjectUnderground/CardScripts/blob/master/CONTRIBUTING.md).
 
 Notes for maintainers: pull requests containing one or very few commits should generally be **squash-merged** to keep history clean.
 
