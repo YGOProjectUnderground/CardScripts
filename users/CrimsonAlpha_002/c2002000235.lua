@@ -123,12 +123,12 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,s.nsfilter,tp,LOCATION_HAND,0,1,1,nil)
 		if #g>0 then
 			Duel.Summon(tp,g:GetFirst(),true,nil)
-			-- local e2=Effect.CreateEffect(c)
-			-- e2:SetType(EFFECT_TYPE_SINGLE)
-			-- e2:SetCode(id)
-			-- e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			-- e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			-- c:RegisterEffect(e2)
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(id)
+			e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			c:RegisterEffect(e2)
 		end
 	end
 end
@@ -150,11 +150,9 @@ function s.matop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=tc:GetMaterialCount()
 	local c=e:GetHandler()
 	if ct>=1 then
-		-- Duel.BreakEffect()
 		Duel.Damage(1-tp,800,REASON_EFFECT)
 	end
 	if ct>=2 and Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)~=0 then
-		-- Duel.BreakEffect()
 		local g=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0)
 		if #g==0 then return end
 		local sg=g:RandomSelect(1-tp,1)

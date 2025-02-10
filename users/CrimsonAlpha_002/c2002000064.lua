@@ -118,6 +118,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(sc:GetLevel())
 		e1:SetReset(RESET_PHASE|PHASE_END)
 		c:RegisterEffect(e1)
+		--negate effects
+		sc:NegateEffects(c)
 	end
 	Duel.SpecialSummonComplete()
 end

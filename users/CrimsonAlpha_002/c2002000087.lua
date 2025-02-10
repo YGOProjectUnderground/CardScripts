@@ -25,8 +25,10 @@ function s.initial_effect(c)
 	e2:SetOperation(s.sumop)
 	c:RegisterEffect(e2)
 end
+s.listed_series={SET_CONSTELLAR,SET_TELLARKNIGHT}
 function s.spfilter(c,tc,e,tp)
 	return c:IsMonster() and c:IsLevel(tc:GetRank()) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) 
+		and c:IsSetCard({SET_CONSTELLAR,SET_TELLARKNIGHT})
 end
 function s.rvcostfilter(c,e,tp)
 	return c:IsMonster() and c:IsType(TYPE_XYZ) and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,c,e,tp)
