@@ -347,45 +347,50 @@ function Auxiliary.NekrozOuroCheck(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsPlayerAffectedByEffect(tp,CARD_NEKROZ_OUROBOROS)
 end
 
-function Auxiliary.IsEquippedByItself(effect)
-	local c=effect:GetHandler()
+function Auxiliary.IsEquippedByItself(param)
+	local c=param
+	if type(param)=="Effect" then
+		c=param:GetHandler()
+	end
 	return c:IsHasEffect(EFFECT_EQUIPPED_ITSELF)
 end
-
-local function GrayCheckOP(e,tp,eg,ep,ev,re,r,rp)
+local function GraydleCheck(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsDisabled() or not aux.IsEquippedByItself(e) then
 		e:SetLabel(1)
 	else e:SetLabel(0) end
 end
-local function GrayDesOP(e,tp,eg,ep,ev,re,r,rp)
+local function GraydleDestroy(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabelObject():GetLabel()~=0 then return end
 	local tc=e:GetHandler():GetEquipTarget()
 	if tc and tc:IsLocation(LOCATION_MZONE) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
-function Auxiliary.GraydleEffect(c)
-	--control
+function Auxiliary.AddGraydleEffect(c)
+	--Take control
 	local eq1=Effect.CreateEffect(c)
 	eq1:SetType(EFFECT_TYPE_EQUIP)
 	eq1:SetCode(EFFECT_SET_CONTROL)
 	eq1:SetCondition(aux.IsEquippedByItself)
 	eq1:SetValue(function(e) return e:GetHandlerPlayer() end)
+	eq1:SetReset(RESET_EVENT|RESETS_STANDARD)
 	c:RegisterEffect(eq1)
+	--When this card leaves the field, destroy the equipped monster
 	local eq2=Effect.CreateEffect(c)
 	eq2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	eq2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	eq2:SetCode(EVENT_LEAVE_FIELD_P)
-	eq2:SetOperation(GrayCheckOP)
+	eq2:SetOperation(GraydleCheck)
+	eq2:SetReset(RESET_EVENT|RESETS_STANDARD)
 	c:RegisterEffect(eq2)
 	local eq3=Effect.CreateEffect(c)
 	eq3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	eq3:SetCode(EVENT_LEAVE_FIELD)
-	eq3:SetOperation(GrayDesOP)
+	eq3:SetOperation(GraydleDestroy)
 	eq3:SetLabelObject(eq2)
+	eq3:SetReset(RESET_EVENT|RESET_OVERLAY|RESET_TOFIELD)
 	c:RegisterEffect(eq3)
 end
-
 function Auxiliary.EquipGraydle(c,e,tp,tc)
 	local xa=tc:GetControler()~=e:GetHandler():GetControler()
 	local xb=aux.CheckStealEquip(tc,e,tp)
@@ -396,20 +401,38 @@ function Auxiliary.EquipGraydle(c,e,tp,tc)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 		e1:SetValue(function(e,c) return c==e:GetLabelObject() end)
 		e1:SetLabelObject(tc)
 		c:RegisterEffect(e1)
-		--Set flag
+		--Equipped by itself
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_EQUIPPED_ITSELF)
 		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e2:SetReset(RESET_EVENT|RESETS_STANDARD)
 		c:RegisterEffect(e2)
+		aux.AddGraydleEffect(c)
 		return true
 	end
 end
+local function EnableEquippedByItselfHint()
+	local ge=Effect.GlobalEffect()
+	ge:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	ge:SetCode(EVENT_ADJUST)
+	ge:SetOperation(
+		function()
+			local g=Duel.GetMatchingGroup(aux.IsEquippedByItself,0,LOCATION_SZONE,LOCATION_SZONE,nil)
+			for c in g:Iter() do
+				if not c:HasFlagEffect(EFFECT_EQUIPPED_ITSELF) then
+					c:RegisterFlagEffect(EFFECT_EQUIPPED_ITSELF,RESET_EVENT|RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,0,1,3402)
+				end
+			end
+		end
+	)
+	Duel.RegisterEffect(ge,0)
+end
+EnableEquippedByItselfHint()
 
 local Azurist={}
 
