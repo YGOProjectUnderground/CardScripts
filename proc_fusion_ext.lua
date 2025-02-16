@@ -54,13 +54,10 @@ local function NormalizePseudoMaterialCount(tp,mg,mg_clone,fc)
 		if mc:HasFlagEffect(NOT_PSEUDO_CARD_FLAG) then
 			local uid=mc:GetFlagEffectLabel(NOT_PSEUDO_CARD_FLAG)
 			local temp_pg=mg:Filter(Card.IsPseudo,nil,uid)
-			local maxct=0
-			for pc in temp_pg:Iter() do
-				local matct=pc:GetFlagEffectLabel(MATERIAL_COUNT_FLAG)
-				if matct>maxct and matct<=fc.max_material_count then
-					maxct=matct
-				end
-			end
+			local _,maxct=temp_pg:GetMaxGroup(function(c)
+				local ct=c:GetFlagEffectLabel(MATERIAL_COUNT_FLAG)
+				return ct<=fc.max_material_count and ct or 0
+			end,nil)
 			for pc in temp_pg:Iter() do
 				local matct=pc:GetFlagEffectLabel(MATERIAL_COUNT_FLAG)
 				if matct~=maxct or matct==maxct and mg_clone:FilterCount(function(sc) return sc:IsPseudo(uid) and sc:GetFlagEffectLabel(MATERIAL_COUNT_FLAG)==matct end,nil)>maxct then
