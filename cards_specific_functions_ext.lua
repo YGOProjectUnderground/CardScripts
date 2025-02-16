@@ -4,7 +4,7 @@ function Auxiliary.EnableMajesticReturn(c,extracat,extrainfo,extraop,returneff)
 	--return
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TODECK | extracat)
-	e1:SetDescription(aux.Stringid(2202500054,2))
+	e1:SetDescription(aux.Stringid(2002000030,2))
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_MZONE)
@@ -24,10 +24,10 @@ function Auxiliary.EnableMajesticReturn(c,extracat,extrainfo,extraop,returneff)
 	end	
 end
 function Auxiliary.MajesticReturnCondition1(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsHasEffect(2202500054)
+	return not e:GetHandler():IsHasEffect(2002000030)
 end
 function Auxiliary.MajesticReturnCondition2(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsHasEffect(2202500054)
+	return e:GetHandler():IsHasEffect(2002000030)
 end
 function Auxiliary.MajesticReturnSubstituteFilter(c)
 	return c:IsCode(27001073) and c:IsAbleToRemoveAsCost()
@@ -216,11 +216,11 @@ local function AmorphOp(e,tp,eg,ep,ev,re,r,rp)
 	local id=c:GetCode()
 	local b1=Duel.CheckReleaseGroup(tp,Card.IsReleasableByEffect,1,c)
 	local b2=true
-	if not (c:IsHasEffect(2202500025) and Duel.SelectYesNo(tp,aux.Stringid(2202500025,0))) then
+	if not (c:IsHasEffect(2002000001) and Duel.SelectYesNo(tp,aux.Stringid(2002000001,0))) then
 		--Tribute 1 monster or destroy this card
 		local op=b1 and Duel.SelectEffect(tp,
-			{b1,aux.Stringid(2202500158,0)},
-			{b2,aux.Stringid(2202500158,1)}) or 2
+			{b1,aux.Stringid(2002000134,0)},
+			{b2,aux.Stringid(2002000134,1)}) or 2
 		if op==1 then
 			local g=Duel.SelectReleaseGroup(tp,Card.IsReleasableByEffect,1,1,c)
 			Duel.Release(g,REASON_COST)
