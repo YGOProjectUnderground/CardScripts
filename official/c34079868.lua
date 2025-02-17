@@ -90,7 +90,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	if not g then return end
-	for tc in aux.Next(g) do
+	for tc in g:Iter() do
 		if tc:IsLocation(LOCATION_MZONE) then
 			Duel.Release(tc,REASON_COST)
 		else
