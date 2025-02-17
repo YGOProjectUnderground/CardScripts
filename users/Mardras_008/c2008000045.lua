@@ -38,9 +38,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_LABYRINTH_WALL}--
-s.listed_names=CARDS_SANGA_KAZEJIN_SUIJIN--,2008000055
+s.listed_names=CARDS_SANGA_KAZEJIN_SUIJIN--,2008000008
 function s.cfilter(c)--self-sp sum
-	return c:IsCode(2008000055) and c:IsAbleToGraveAsCost()
+	return c:IsCode(2008000008) and c:IsAbleToGraveAsCost()
 end
 function s.spcond(e,c)
 	if c==nil then return true end
