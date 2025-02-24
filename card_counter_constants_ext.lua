@@ -16,6 +16,7 @@ CARD_THE_AZURE_PROJECT             = 2003000037
 --Commonly used counters
 COUNTER_BLAZE						= 0x271
 COUNTER_HONEY						= 0x272
+COUNTER_SPARKWAVE       = 0x2a7
 
 --Archetypes
 SET_EXODIA_NECROSS 				= 0x10de
@@ -31,3 +32,4 @@ SET_STELLARNOVA 				   = 0x997
 SET_AZURIST                        = 0xf16
 SET_STARRYTAIL                     = 0xf13
 SET_LYCANSQUAD                     = 0xf17
+SET_SPARKWAVE                      = 0x2a7
