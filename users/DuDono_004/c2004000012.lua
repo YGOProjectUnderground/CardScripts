@@ -1,4 +1,5 @@
 -- Sparkwave Bhavishy
+Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     -- place engine
@@ -54,7 +55,7 @@ function s.engop(e, tp, eg, ep, ev, re, r, rp)
 end
 
 function s.thfilter(c)
-    return c:IsSetCard(0x2a7) and c:IsAbleToHand() and c:IsSpellTrap()
+    return c:IsSetCard(SET_SPARKWAVE) and c:IsAbleToHand() and c:IsSpellTrap()
 end
 function s.thtg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk == 0 then
@@ -72,7 +73,7 @@ function s.thop(e, tp, eg, ep, ev, re, r, rp)
 end
 function s.filter(c,tp)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_SZONE)
-		and c:IsSetCard(0x2a7) and not c:IsReason(REASON_REPLACE)
+		and c:IsSetCard(SET_SPARKWAVE) and not c:IsReason(REASON_REPLACE)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.IsPlayerAffectedByEffect(e:GetHandlerPlayer(),69832741)

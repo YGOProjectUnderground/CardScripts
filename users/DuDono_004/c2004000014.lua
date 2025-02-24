@@ -1,4 +1,5 @@
 -- Sparkwave Avenir
+Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     -- place engine
@@ -41,7 +42,7 @@ function s.engop(e, tp, eg, ep, ev, re, r, rp)
 end
 
 function s.spfilter(c, e, tp, zone)
-    return c:IsCanBeSpecialSummoned(e, 0, tp, false, false, POS_FACEUP, tp, zone) and c:IsSetCard(0x2a7)
+    return c:IsCanBeSpecialSummoned(e, 0, tp, false, false, POS_FACEUP, tp, zone) and c:IsSetCard(SET_SPARKWAVE)
 end
 function s.spcon(e, tp, eg, ep, ev, re, r, rp)
     return Duel.IsTurnPlayer(1-tp)

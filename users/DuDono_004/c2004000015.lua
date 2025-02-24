@@ -1,4 +1,5 @@
 -- Sparkwave's Haste
+Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
   -- activate
@@ -36,7 +37,7 @@ function s.initial_effect(c)
   c:RegisterEffect(e5)
 end
 function s.filter(c)
-	return c:IsSetCard(0x2a7) and c:IsMonster() and c:IsAbleToHand()
+	return c:IsSetCard(SET_SPARKWAVE) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk == 0 then
@@ -54,7 +55,7 @@ function s.actop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.indtg(e,c)
-	return c:IsSetCard(0x2a7) and c:IsSpellTrap() and c ~= e:GetHandler()
+	return c:IsSetCard(SET_SPARKWAVE) and c:IsSpellTrap() and c ~= e:GetHandler()
 end
 function s.imval(e,re)
   return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
@@ -71,5 +72,5 @@ end
 function s.countop(e,tp,eg,ep,ev,re,r,rp)
   local eng = Duel.SelectMatchingCard(tp,Card.IsCode,tp,LOCATION_SZONE,0,1,1,nil,2004000010):GetFirst()
   local ct = e:GetLabel()
-  eng:AddCounter(0x2a7, ct)
+  eng:AddCounter(COUNTER_SPARKWAVE, ct)
 end

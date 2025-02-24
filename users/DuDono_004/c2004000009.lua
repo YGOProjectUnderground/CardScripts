@@ -1,4 +1,5 @@
 -- Sparkwave Mellontikos
+Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
   -- link summon
@@ -27,13 +28,13 @@ function s.initial_effect(c)
   e2:SetOperation(s.countop)
   c:RegisterEffect(e2)
 end
-s.counter_place_list = {0x2a7}
+s.counter_place_list = {COUNTER_SPARKWAVE}
 function s.foolcon(e,tp,eg,ep,ev,re,r,rp)
   local c=e:GetHandler()
 	return c:IsSummonType(SUMMON_TYPE_LINK)
 end
 function s.foolfilter(c)
-	return c:IsMonster() and c:IsAbleToGrave() and c:IsSetCard(0x2a7)
+	return c:IsMonster() and c:IsAbleToGrave() and c:IsSetCard(SET_SPARKWAVE)
 end
 function s.fooltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.foolfilter,ep,LOCATION_DECK,0,1,nil) end
@@ -47,7 +48,7 @@ function s.foolop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.countfilter(c)
-  return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x2a7) and c:HasLevel()
+  return c:IsType(TYPE_MONSTER) and c:IsSetCard(SET_SPARKWAVE) and c:HasLevel()
 end
 function s.counttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
   if chkc then return s.countfilter(chkc) and chkc:IsLocation(LOCATION_GRAVE) end
@@ -59,5 +60,5 @@ function s.countop(e,tp,eg,ep,ev,re,r,rp)
   local x = e:GetHandler():GetControler()
   local engine = Duel.SelectMatchingCard(x,Card.IsCode,x,LOCATION_SZONE,0,1,1,nil,2004000010):GetFirst()
   local g = Duel.GetFirstTarget()
-  engine:AddCounter(0x2a7,g:GetLevel())
+  engine:AddCounter(COUNTER_SPARKWAVE,g:GetLevel())
 end

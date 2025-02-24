@@ -1,4 +1,5 @@
 -- Sparkwave Plasma
+Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     -- activate
@@ -43,7 +44,7 @@ function s.initial_effect(c)
 end
 
 function s.spfilter(c,tp)
-    return c:IsRace(RACE_THUNDER) and c:IsLinkSummonable() and Duel.IsCanRemoveCounter(tp,1,0,0x2a7,c:GetLink(),REASON_EFFECT) and not c:IsPublic()
+    return c:IsRace(RACE_THUNDER) and c:IsLinkSummonable() and Duel.IsCanRemoveCounter(tp,1,0,COUNTER_SPARKWAVE,c:GetLink(),REASON_EFFECT) and not c:IsPublic()
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,tp) end
@@ -55,7 +56,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
     if not c then return end
     Duel.ConfirmCards(1-tp,c)
     Duel.BreakEffect()
-    if Duel.RemoveCounter(tp,1,0,0x2a7,c:GetLink(),REASON_EFFECT) then
+    if Duel.RemoveCounter(tp,1,0,COUNTER_SPARKWAVE,c:GetLink(),REASON_EFFECT) then
         Duel.LinkSummon(tp,c)
     end
 end

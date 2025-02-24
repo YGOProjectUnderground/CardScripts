@@ -1,4 +1,5 @@
 -- Sparkwave Mirai
+Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     -- place engine
@@ -77,7 +78,7 @@ function s.spop(e, tp, eg, ep, ev, re, r, rp)
 end
 function s.drawcon(e,tp,eg,ep,ev,re,r,rp)
     local sc = e:GetHandler():GetReasonCard()
-    return r==REASON_LINK and Duel.GetTurnPlayer() == 1-tp and sc:IsSetCard(0x2a7)
+    return r==REASON_LINK and Duel.GetTurnPlayer() == 1-tp and sc:IsSetCard(SET_SPARKWAVE)
 end
 function s.drawtg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk == 0 then

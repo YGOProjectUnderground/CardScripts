@@ -1,4 +1,5 @@
 -- Sparkwave Futurum
+Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     Link.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsRace,RACE_THUNDER),2)
@@ -52,7 +53,7 @@ end
 function s.drcon(e, tp, eg, ep, ev, re, r, rp)
     local tg = eg:GetFirst()
     return #eg == 1 and tg ~= e:GetHandler() and tg:GetSummonType() == SUMMON_TYPE_LINK and rp ==
-               e:GetHandler():GetControler() and rp ~= Duel.GetTurnPlayer() and tg:IsSetCard(0x2a7)
+               e:GetHandler():GetControler() and rp ~= Duel.GetTurnPlayer() and tg:IsSetCard(SET_SPARKWAVE)
 end
 function s.drtg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk == 0 then

@@ -1,4 +1,5 @@
 -- Sparkwave Future
+Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     -- place engine
@@ -53,7 +54,7 @@ function s.engop(e, tp, eg, ep, ev, re, r, rp)
 end
 
 function s.filter(c,e,tp)
-	return c:IsSetCard(0x2a7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(SET_SPARKWAVE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcon(e, tp, eg, ep, ev, re, r, rp)
     return Duel.GetTurnPlayer() == 1-tp

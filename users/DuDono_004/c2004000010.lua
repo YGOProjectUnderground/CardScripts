@@ -1,7 +1,8 @@
 -- Sparkwave Engine
+Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
-    c:EnableCounterPermit(0x2a7)
+    c:EnableCounterPermit(COUNTER_SPARKWAVE)
     -- can only control 1
     c:SetUniqueOnField(1, 0, id)
     -- activate
@@ -67,16 +68,16 @@ function s.initial_effect(c)
 end
 function s.acop(e, tp, eg, ep, ev, re, r, rp)
     if re:IsActiveType(TYPE_SPELL + TYPE_TRAP + TYPE_MONSTER) and ep~=tp and e:GetHandler():GetFlagEffect(1)>0 then
-        e:GetHandler():AddCounter(0x2a7, 1)
+        e:GetHandler():AddCounter(COUNTER_SPARKWAVE, 1)
     end
 end
 function s.sop(e, tp, eg, ep, ev, re, r, rp)
     if eg:IsExists(Card.IsSummonPlayer, 1, nil, 1 - tp) then
-        e:GetHandler():AddCounter(0x2a7, 1)
+        e:GetHandler():AddCounter(COUNTER_SPARKWAVE, 1)
     end
 end
 function s.deckfilter(c)
-    return c:IsDiscardable() and c:IsSetCard(0x2a7)
+    return c:IsDiscardable() and c:IsSetCard(SET_SPARKWAVE)
 end
 function s.deckfilter2(c, id)
     return c:IsCode(176490000)
@@ -90,8 +91,8 @@ function customComparator(n, bol)
     end
 end
 function s.filter(c, cc, e, tp)
-    return c:IsSetCard(0x2a7) and c:IsCanBeSpecialSummoned(e, 0, tp, false, false) and c:HasLevel() and
-               cc:IsCanRemoveCounter(tp, 0x2a7, c:GetLevel(), REASON_COST)
+    return c:IsSetCard(SET_SPARKWAVE) and c:IsCanBeSpecialSummoned(e, 0, tp, false, false) and c:HasLevel() and
+               cc:IsCanRemoveCounter(tp, COUNTER_SPARKWAVE, c:GetLevel(), REASON_COST)
 end
 function s.sptg(e, tp, eg, ep, ev, re, r, rp, chk)
     local x = e:GetHandler():GetControler()
@@ -119,12 +120,12 @@ function s.sptg(e, tp, eg, ep, ev, re, r, rp, chk)
     lvt[pc] = nil
     Duel.Hint(HINT_SELECTMSG, x, aux.Stringid(id, 0))
     local lv = Duel.AnnounceNumber(x, table.unpack(lvt))
-    e:GetHandler():RemoveCounter(x, 0x2a7, lv, REASON_COST)
+    e:GetHandler():RemoveCounter(x, COUNTER_SPARKWAVE, lv, REASON_COST)
     e:SetLabel(lv)
     Duel.SetOperationInfo(0, CATEGORY_SPECIAL_SUMMON, nil, 1, x, LOCATION_HAND + LOCATION_GRAVE)
 end
 function s.sfilter(c, lv, e, tp)
-    return c:IsSetCard(0x2a7) and c:IsCanBeSpecialSummoned(e, 0, e:GetHandler():GetControler(), false, false) and c:GetLevel() == lv
+    return c:IsSetCard(SET_SPARKWAVE) and c:IsCanBeSpecialSummoned(e, 0, e:GetHandler():GetControler(), false, false) and c:GetLevel() == lv
 end
 function s.spop(e, tp, eg, ep, ev, re, r, rp)
     local x = e:GetHandler():GetControler()

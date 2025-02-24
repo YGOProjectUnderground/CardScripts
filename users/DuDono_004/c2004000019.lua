@@ -1,4 +1,5 @@
 -- Sparkwave Ikusasa
+Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     -- place engine
@@ -60,7 +61,7 @@ function s.target(e, tp, eg, ep, ev, re, r, rp, chk)
 end
 function s.operation(e, tp, ep, eg, ev, re, r, rp)
     local engine = Duel.SelectMatchingCard(tp, Card.IsCode, tp, LOCATION_SZONE, 0, 1, 1, nil, 2004000010):GetFirst()
-    engine:AddCounter(0x2a7, 3)
+    engine:AddCounter(COUNTER_SPARKWAVE, 3)
 end
 
 function s.negtg(e, tp, eg, ep, ev, re, r, rp, chk)
