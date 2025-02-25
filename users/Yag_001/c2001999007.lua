@@ -1,6 +1,7 @@
 --深海のファルセット
 --Deep Sea Falsetto
 --Scripted by Yag
+--Modified to use revealing WATER Tuner instead of discarding WATER monster
 Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
@@ -39,15 +40,16 @@ end
 s.listed_names={78868119, 50793215} --Deep Sea Diva, Deep Sea Prima Donna
 
 function s.cfilter(c)
-	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsDiscardable()
+	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsType(TYPE_TUNER) and not c:IsPublic()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then e:GetLabelObject():SetLabel(0) return true end
 	if e:GetLabelObject():GetLabel()>0 then
 		e:GetLabelObject():SetLabel(0)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 		local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil)
-		Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
+		Duel.ConfirmCards(1-tp,g)
+		Duel.ShuffleHand(tp)
 	end
 end
 function s.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
