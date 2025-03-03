@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e3:SetCode(EVENT_CHAINING)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetCountLimit(1)
+	e3:SetCountLimit(1,{id,1})
 	e3:SetCondition(s.tdcon)
 	e3:SetTarget(s.tdtg)
 	e3:SetOperation(s.tdop)
@@ -37,7 +37,7 @@ s.listed_series={0x5a}
 --special summon when penguin activates effect
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsReason(REASON_EFFECT) and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsSetCard(0x5a) and c:IsMonsterEffect()
+	return c:IsReason(REASON_EFFECT) and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsSetCard(0x5a)
 end
 function s.filter(c,e,tp)
 	return c:IsSetCard(0x5a) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelBelow(4)
