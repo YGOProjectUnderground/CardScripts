@@ -1,4 +1,5 @@
 --Abyssal Dread Abyst
+Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Add 1 Abyssal Dread to hand from deck and Special Summon 1 Aqua, Sea Serpent or Fish monster from hand

@@ -1,4 +1,5 @@
 --Bound Prisoner of Megaera
+Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
     --Must be Special Summoned by its own effect

@@ -1,4 +1,5 @@
 --Escort Penguin
+Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--If this card is used for the Xyz Summon of a WATER monster, it can be treated as a Level 4 monster
