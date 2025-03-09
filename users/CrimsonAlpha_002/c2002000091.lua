@@ -78,24 +78,33 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if ct<=0 then return end
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ct=1 end
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,ct,aux.dpcheck(Card.GetAttribute),1,tp,HINTMSG_SPSUMMON)
-	if #sg>0 then
+	if #sg>0 then 
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
-		for tc in aux.Next(sg) do
-			--synchro level
-			local e2=Effect.CreateEffect(tc)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetRange(LOCATION_MZONE)
-			e2:SetCode(EFFECT_SYNCHRO_LEVEL)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			e2:SetValue(s.slevel)
-			tc:RegisterEffect(e2)
-		end
+		-- for tc in aux.Next(sg) do
+			-- --synchro level
+			-- local e2=Effect.CreateEffect(tc)
+			-- e2:SetType(EFFECT_TYPE_SINGLE)
+			-- e2:SetRange(LOCATION_MZONE)
+			-- e2:SetCode(EFFECT_SYNCHRO_LEVEL)
+			-- e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			-- e2:SetValue(s.slevel)
+			-- tc:RegisterEffect(e2)
+		-- end
 	end
+	--Cannot Special Summon from the Extra Deck, except Synchro Monsters
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,2))
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(function(e,c) return c:IsLocation(LOCATION_EXTRA) and not c:IsType(TYPE_SYNCHRO) end)
+	Duel.RegisterEffect(e1,tp)
 end
-function s.slevel(e,c)
-	local lv=e:GetHandler():GetLevel()
-	return 1*65536+lv
-end
+-- function s.slevel(e,c)
+	-- local lv=e:GetHandler():GetLevel()
+	-- return 1*65536+lv
+-- end
 	--Compound filter for proper target selection
 function s.tgfilter(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(SET_YANG_ZING) and c:IsMonster() and not c:IsType(TYPE_TUNER)

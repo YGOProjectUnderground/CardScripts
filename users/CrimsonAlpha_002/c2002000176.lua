@@ -5,17 +5,7 @@ function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	c:EnableReviveLimit()
 	Link.AddProcedure(c,s.mfilter,1,1)
-	--spsummon cost
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetCode(EFFECT_SPSUMMON_COST)
-	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e0:SetCost(s.splimcost)
-	e0:SetOperation(s.splimop)
-	c:RegisterEffect(e0)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_SUMMON,s.counterfilter)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_FLIPSUMMON,s.counterfilter)
+	-- Add 1 "War Rock Mountain" from Deck or GY
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -49,37 +39,12 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 s.listed_series={SET_WAR_ROCK}
-function s.mfilter(c,lc,sumtype,tp)
-	return c:IsSetCard(SET_WAR_ROCK,lc,sumtype,tp)
-end
-function s.counterfilter(c)
-	return c:IsSetCard(SET_WAR_ROCK)
-end
-function s.splimcost(e,c,tp)
-	return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0
-		and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SUMMON)==0
-		and Duel.GetCustomActivityCount(id,tp,ACTIVITY_FLIPSUMMON)==0
-end
-function s.splimop(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-	e1:SetDescription(aux.Stringid(id,1))
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(s.splimit)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
-end
-function s.splimit(e,c,tp,sumtp,sumpos)
-	return not c:IsSetCard(SET_WAR_ROCK)
-end
+s.listed_names={45943516}
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
 function s.thfilter(c)
-	return c:IsSetCard(SET_WAR_ROCK) and c:IsAbleToHand()
+	return c:IsCode(45943516) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -92,16 +57,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-		-- Cannot activate monster effects
-		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(id,2))
-		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-		e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-		e1:SetTargetRange(1,0)
-		e1:SetValue(s.aclimit)
-		e1:SetReset(RESET_PHASE|PHASE_END)
-		Duel.RegisterEffect(e1,tp)
 	end
 end
 function s.aclimit(e,re,tp)
@@ -140,8 +95,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and c:IsAttackPos() and tc and tc:IsRelateToEffect(e)
 		and c:CanAttack() and not c:IsImmuneToEffect(e) and not tc:IsImmuneToEffect(e) then
-		Duel.CalculateDamage(c,tc)
-		c:RegisterFlagEffect(id,RESET_PHASE+PHASE_END,0,1)
 		local atkg=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsSetCard,SET_WAR_ROCK),tp,LOCATION_MZONE,0,nil)
 		for tc in aux.Next(atkg) do
 			--Increase ATK
@@ -153,5 +106,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			e2:SetValue(200)
 			tc:RegisterEffect(e2)
 		end
+		Duel.BreakEffect()
+		Duel.CalculateDamage(c,tc)
+		c:RegisterFlagEffect(id,RESET_PHASE+PHASE_END,0,1)
 	end
 end

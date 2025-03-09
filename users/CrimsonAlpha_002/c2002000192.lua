@@ -3,7 +3,7 @@ Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableUnsummonable()
-	--Must be special summoned by a card effect
+	-- Must be special summoned by a card effect
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -19,50 +19,65 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_TO_HAND)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetCountLimit(1,{id,0})
-	e2:SetCondition(s.condition)
+	e2:SetCondition(s.con_add)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
 	--Special Summon "PSY-Frame Driver"
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
-	e3:SetCountLimit(1,{id,1})
-	e3:SetTarget(s.sptg)
-	e3:SetOperation(s.spop)
-	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
+	e4:SetCountLimit(1,{id,1})
+	e4:SetTarget(s.sptg)
+	e4:SetOperation(s.spop)
+	c:RegisterEffect(e4)
 end
-s.listed_names={CARD_PSYFRAME_DRIVER,575512}
+s.listed_series={SET_PSY_FRAME}
+s.listed_names={CARD_PSYFRAME_DRIVER}
 function s.splimit(e,se,sp,st)
 	return se:IsHasType(EFFECT_TYPE_ACTIONS)
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.con_add(e,tp,eg,ep,ev,re,r,rp)
 	return (r&REASON_EFFECT)~=0 
 		and eg:IsExists(Card.IsControler,1,nil,1-tp)
 		and (Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 
 		or Duel.IsPlayerAffectedByEffect(tp,CARD_PSYFRAME_LAMBDA))
 end
-function s.filter(c)
-	return c:IsCode(575512) 
-		and c:IsFieldSpell() and not c:IsForbidden()
+function s.con_draw(e,tp,eg,ep,ev,re,r,rp)
+	return r&REASON_EFFECT~=0 
+		and ep~=tp 
+		and rp==ep
+end
+function s.filter(c,tp)
+	return c:IsSetCard(SET_PSY_FRAME) 
+		and (c:IsFieldSpell() or c:IsType(TYPE_CONTINUOUS))
+		and c:CheckUniqueOnField(tp)
+		and not c:IsForbidden() 
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then 
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil) 
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND|LOCATION_DECK,0,1,nil,tp) 
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function s.placefield(c,tp)
-	local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
-	if fc then
-		Duel.SendtoGrave(fc,REASON_RULE)
+	local loc=nil
+	if c:IsFieldSpell() then
+		loc=LOCATION_FZONE
+		local fc=Duel.GetFieldCard(tp,loc,0)
+		if fc then
+			Duel.SendtoGrave(fc,REASON_RULE)
+		end
+	else
+		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+		loc=LOCATION_SZONE
 	end
-	return Duel.MoveToField(c,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
+	return Duel.MoveToField(c,tp,tp,loc,POS_FACEUP,true)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
@@ -82,7 +97,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetOperation(s.rmop)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,tp)
-		local tc=Duel.GetFirstMatchingCard(s.filter,tp,LOCATION_HAND|LOCATION_DECK,0,nil)
+		local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND|LOCATION_DECK,0,1,1,nil,tp):GetFirst()
 		if not tc then return end
 		s.placefield(tc,tp)
 	end 
@@ -126,4 +141,14 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,tp)
 	end
+end
+function s.tgdr(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(2)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
+end
+function s.opdr(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Draw(p,d,REASON_EFFECT)
 end
