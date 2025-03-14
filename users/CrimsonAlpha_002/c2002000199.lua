@@ -75,25 +75,55 @@ function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(SET_WORLD_CHALICE) and c:IsLinkMonster()
 end
 function s.spfilter(c,e,tp)
-	return c:IsOriginalType(TYPE_NORMAL) and c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	if not (c:IsOriginalType(TYPE_NORMAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)) then return false end
+	if c:IsLocation(LOCATION_EXTRA) then
+		return Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
+	else
+		return Duel.GetMZoneCount(tp)>0
+	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if e:GetHandler():GetSequence()<5 then ft=ft+1 end
-	if chk==0 then return ft>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE|LOCATION_EXTRA|LOCATION_PZONE,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE|LOCATION_EXTRA|LOCATION_PZONE)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_PZONE|LOCATION_EXTRA|LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_PZONE|LOCATION_EXTRA|LOCATION_GRAVE)
+end
+function s.exfilter(c)
+	return c:IsLocation(LOCATION_EXTRA) and c:IsFaceup() and c:IsType(TYPE_PENDULUM)
+end
+function s.rescon(ft1,ft2,ft3,ft)
+	return function(sg,e,tp,mg)
+			local expct=sg:FilterCount(s.exfilter,nil,LOCATION_EXTRA)
+			local mct=sg:FilterCount(aux.NOT(Card.IsLocation),nil,LOCATION_EXTRA)
+			local exct=sg:FilterCount(Card.IsLocation,nil,LOCATION_EXTRA)
+			local res=ft3>=expct and ft1>=mct
+			return res,not res
+		end
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft<=0 then return end
-	if ft>2 then ft=2 end
-	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE|LOCATION_EXTRA|LOCATION_PZONE,0,1,ft,nil,e,tp)
-	if #g~=0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local ft2=Duel.GetLocationCountFromEx(tp)
+	local ft3=Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_PENDULUM)
+	local ft=math.min(Duel.GetUsableMZoneCount(tp),2)
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then
+		if ft1>0 then ft1=1 end
+		if ft2>0 then ft2=1 end
+		if ft3>0 then ft3=1 end
+		ft=1
 	end
+	local ect=aux.CheckSummonGate(tp)
+	if ect then
+		ft1=math.min(ect,ft1)
+		ft2=math.min(ect,ft2)
+		ft3=math.min(ect,ft3)
+	end
+	local loc=0
+	if ft1>0 then loc=loc+LOCATION_PZONE+LOCATION_GRAVE end
+	if ft2>0 or ft3>0 then loc=loc+LOCATION_EXTRA end
+	if loc==0 then return end
+	local sg=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter),tp,loc,0,nil,e,tp)
+	if #sg==0 then return end
+	local rg=aux.SelectUnselectGroup(sg,e,tp,1,ft,s.rescon(ft1,ft2,ft3,ft),1,tp,HINTMSG_SPSUMMON)
+	Duel.SpecialSummon(rg,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 end
