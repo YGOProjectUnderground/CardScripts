@@ -1,9 +1,8 @@
 -- Sparkwave Tulevaisuutta
-Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     -- link procedure
-    Link.AddProcedure(c, nil, 2, 4, s.lcheck)
+    Link.AddProcedure(c, nil, 2, 5, s.lcheck)
     c:EnableReviveLimit()
     -- shuffle cards into the deck
     local e1 = Effect.CreateEffect(c)
@@ -59,7 +58,7 @@ function s.torop(e, tp, eg, ep, ev, re, r, rp)
     end
 end
 function s.value(e)
-    return Duel.GetCounter(e:GetHandlerPlayer(), 1, 0, COUNTER_SPARKWAVE) * 200
+    return Duel.GetCounter(e:GetHandlerPlayer(), 1, 0, 0x2a7) * 200
 end
 function s.condition(e)
     return Duel.GetTurnPlayer() ~= e:GetHandlerPlayer()
