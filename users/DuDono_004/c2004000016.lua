@@ -1,10 +1,9 @@
 -- Sparkwave Mustaqbal
-Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     -- place engine
     local e0 = Effect.CreateEffect(c)
-    e0:SetDescription(aux.Stringid(2004000010,3))
+    e0:SetDescription(aux.Stringid(2004000010, 3))
     e0:SetType(EFFECT_TYPE_QUICK_O)
     e0:SetCode(EVENT_FREE_CHAIN)
     e0:SetHintTiming(TIMING_DRAW_PHASE, TIMING_DRAW_PHASE)
@@ -13,26 +12,18 @@ function s.initial_effect(c)
     e0:SetTarget(s.engtg)
     e0:SetOperation(s.engop)
     c:RegisterEffect(e0)
-    -- special summon
+    -- special summon itself
     local e1 = Effect.CreateEffect(c)
-    e1:SetDescription(aux.Stringid(87774234, 0))
+    e1:SetDescription(aux.Stringid(id, 0))
     e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-    e1:SetType(EFFECT_TYPE_SINGLE + EFFECT_TYPE_TRIGGER_O)
-    e1:SetProperty(EFFECT_FLAG_DELAY)
-    e1:SetCode(EVENT_TO_HAND)
-    e1:SetRange(LOCATION_HAND)
+    e1:SetType(EFFECT_TYPE_QUICK_O)
+    e1:SetCode(EVENT_FREE_CHAIN)
+    e1:SetRange(LOCATION_HAND|LOCATION_GRAVE)
+	e1:SetCountLimit(1,{id,1})
     e1:SetCondition(s.spcon)
     e1:SetTarget(s.sptg)
     e1:SetOperation(s.spop)
     c:RegisterEffect(e1)
-    -- burn
-    local e2 = Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_SINGLE)
-    e2:SetProperty(EFFECT_FLAG_DELAY)
-    e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-    e2:SetTarget(s.burntg)
-    e2:SetOperation(s.burnop)
-    c:RegisterEffect(e2)
 end
 
 function s.engcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -49,34 +40,22 @@ function s.engop(e, tp, eg, ep, ev, re, r, rp)
     Duel.MoveToField(tc, tp, tp, LOCATION_SZONE, POS_FACEUP, true)
 end
 
-function s.spcon(e, tp, eg, ep, ev, re, r, rp)
-    return Duel.GetTurnPlayer() == 1 - tp and e:GetHandler():IsPreviousLocation(LOCATION_DECK) and
-               e:GetHandler():IsPreviousControler(tp)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer() == 1-e:GetHandlerPlayer()
 end
-function s.sptg(e, tp, eg, ep, ev, re, r, rp, chk)
-    if chk == 0 then
-        return e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(tp, LOCATION_MZONE) > 0 and
-                   e:GetHandler():IsCanBeSpecialSummoned(e, 0, tp, false, false)
-    end
-    Duel.SetOperationInfo(0, CATEGORY_SPECIAL_SUMMON, e:GetHandler(), 1, 0, 0)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_HAND|LOCATION_ONFIELD,0,1,c) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_HAND|LOCATION_ONFIELD)
 end
-function s.spop(e, tp, eg, ep, ev, re, r, rp)
-    local c = e:GetHandler()
-    if not c:IsRelateToEffect(e) then
-        return
-    end
-    Duel.SpecialSummon(c, 0, tp, tp, false, false, POS_FACEUP)
-end
-
-function s.burntg(e, tp, eg, ep, ev, re, r, rp, chk)
-    if chk == 0 then
-        return true
-    end
-    Duel.SetTargetPlayer(tp)
-    Duel.SetTargetParam(1000)
-    Duel.SetOperationInfo(0, CATEGORY_DAMAGE, 0, 0, tp, 1000)
-end
-function s.burnop(e, tp, eg, ep, ev, re, r, rp)
-    local p, d = Duel.GetChainInfo(0, CHAININFO_TARGET_PLAYER, CHAININFO_TARGET_PARAM)
-    Duel.Damage(p, d, REASON_EFFECT)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local c=e:GetHandler()
+	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_HAND,0,1,1,c)
+	if #g>0 and Duel.SendtoGrave(g,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_GRAVE) and c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
 end

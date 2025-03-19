@@ -1,5 +1,4 @@
 -- Sparkwave Future
-Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     -- place engine
@@ -33,7 +32,6 @@ function s.initial_effect(c)
     e2:SetCode(EVENT_FREE_CHAIN)
     e2:SetHintTiming(0, TIMINGS_CHECK_MONSTER + TIMING_MAIN_END)
     e2:SetRange(LOCATION_MZONE)
-    e2:SetCost(s.linkcost)
     e2:SetTarget(s.linktg)
     e2:SetOperation(s.linkop)
     c:RegisterEffect(e2)
@@ -54,7 +52,7 @@ function s.engop(e, tp, eg, ep, ev, re, r, rp)
 end
 
 function s.filter(c,e,tp)
-	return c:IsSetCard(SET_SPARKWAVE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x2a7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcon(e, tp, eg, ep, ev, re, r, rp)
     return Duel.GetTurnPlayer() == 1-tp
@@ -78,10 +76,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
     end
 end
 
-function s.linkcost(e, tp, eg, ep, ev, re, r, rp, chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
-	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD,nil)
-end
 function s.linktg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk == 0 then
         return Duel.IsExistingMatchingCard(Card.IsLinkSummonable, tp, LOCATION_EXTRA, 0, 1, nil, nil)
