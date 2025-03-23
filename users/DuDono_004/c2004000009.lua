@@ -33,7 +33,7 @@ function s.foolcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsSummonType(SUMMON_TYPE_LINK)
 end
 function s.foolfilter(c)
-	return c:IsMonster() and c:IsAbleToGrave() and c:IsSetCard(0x2a7)
+	return c:IsMonster() and c:IsAbleToGrave() and c:IsSetCard(SET_SPARKWAVE)
 end
 function s.fooltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.foolfilter,ep,LOCATION_DECK,0,1,nil) end
@@ -52,5 +52,5 @@ function s.counttg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.countop(e,tp,eg,ep,ev,re,r,rp)
   local engine = Duel.SelectMatchingCard(tp,Card.IsCode,tp,LOCATION_SZONE,0,1,1,nil,2004000010):GetFirst()
-  engine:AddCounter(0x2a7,3)
+  engine:AddCounter(COUNTER_SPARKWAVE,3)
 end
