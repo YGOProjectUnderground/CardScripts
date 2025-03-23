@@ -58,7 +58,7 @@ function s.torop(e, tp, eg, ep, ev, re, r, rp)
     end
 end
 function s.value(e)
-    return Duel.GetCounter(e:GetHandlerPlayer(), 1, 0, 0x2a7) * 200
+    return Duel.GetCounter(e:GetHandlerPlayer(), 1, 0, COUNTER_SPARKWAVE) * 200
 end
 function s.condition(e)
     return Duel.GetTurnPlayer() ~= e:GetHandlerPlayer()
