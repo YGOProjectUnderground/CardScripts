@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function s.filter(c)
-	return c:IsSetCard(0x2a7) and c:IsMonster() and c:IsAbleToHand()
+	return c:IsSetCard(SET_SPARKWAVE) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk == 0 then
