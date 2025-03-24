@@ -2,8 +2,8 @@
   Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
-  -- handtrap
-  local e1 = Effect.CreateEffect(c)
+	-- handtrap
+	local e1 = Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON + CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -14,23 +14,23 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-  -- protecc
-  local e2 = Effect.CreateEffect(c)
-  e2:SetType(EFFECT_TYPE_QUICK_O)
-  e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-  e2:SetCode(EVENT_CHAINING)
-  e2:SetRange(LOCATION_MZONE)
-  e2:SetCountLimit(3)
-  e2:SetCost(s.prcost)
-  e2:SetTarget(s.prtg)
-  e2:SetOperation(s.prop)
-  c:RegisterEffect(e2)
+	-- protecc
+	local e2 = Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCode(EVENT_CHAINING)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,{id,1})
+	e2:SetCost(s.prcost)
+	e2:SetTarget(s.prtg)
+	e2:SetOperation(s.prop)
+	c:RegisterEffect(e2)
 end
 s.listed_names = {CARD_DREAMING_NEMLERIA}
 s.listed_series = {SET_NEMLERIA}
 
 function s.handfilter(c)
-  return c:IsAbleToHand() and not c:IsAbleToExtra()
+	return c:IsAbleToHand() and not c:IsAbleToExtra()
 end
 function s.spcost(e, tp, eg, ep, ev, re, r, rp, chk)
 	if chk == 0 then
@@ -64,7 +64,7 @@ function s.spop(e, tp, eg, ep, ev, re, r, rp)
 end
 
 function s.prfilter(c)
-  return c:IsSetCard(SET_NEMLERIA)
+	return c:IsSetCard(SET_NEMLERIA)
 end
 function s.prfilter2(c)
 	return c:IsFacedown() and c:IsAbleToRemoveAsCost(POS_FACEDOWN)
