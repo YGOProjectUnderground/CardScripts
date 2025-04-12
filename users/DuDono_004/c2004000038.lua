@@ -1,5 +1,4 @@
 -- Eclipse Observer Baleygr
-Duel.LoadScript("local_custom_init.lua")
 Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
@@ -63,7 +62,7 @@ function s.etarget(e,c)
 	return c:IsSetCard(SET_ECLIPSE_OBSERVER)
 end
 function s.efilter(e,re)
-	return re:GetHandler():IsEclipseQP()
+	return re:GetHandler():IsQuickPlaySpell() and re:GetHandler():IsSetCard(SET_ECLIPSE)
 end
 
 function s.protcon(e,tp,eg,ep,ev,re,r,rp)
