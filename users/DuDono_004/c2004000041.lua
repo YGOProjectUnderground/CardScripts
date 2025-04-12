@@ -1,5 +1,6 @@
 -- Eclipse Observer Chandra
 local s, id = GetID()
+Duel.LoadScript("_load_.lua")
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	-- xyz procedure
@@ -68,10 +69,10 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.gyfilter(c)
-	return c:IsEclipseQP()
+	return c:IsQuickPlaySpell() and c:IsSetCard(SET_ECLIPSE)
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.gyfilter,tp,LOCATION_GRAVE,0,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.gyfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
 end
