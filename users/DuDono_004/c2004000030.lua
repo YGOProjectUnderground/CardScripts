@@ -1,5 +1,4 @@
 -- Eclipse Observer Ella
-Duel.LoadScript("local_custom_init.lua")
 Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
@@ -56,7 +55,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.setfilter(c)
-	return Card.IsEclipseQP(c) and c:IsSSetable()
+	return c:IsQuickPlaySpell() and c:IsSetCard(SET_ECLIPSE) and c:IsSSetable()
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil) end
