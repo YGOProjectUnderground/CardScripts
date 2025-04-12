@@ -1,5 +1,4 @@
 -- Eclipse Observatory
-Duel.LoadScript("local_custom_init.lua")
 Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
@@ -28,6 +27,9 @@ end
 function s.filter(c)
 	return c:IsSetCard(SET_ECLIPSE_OBSERVER) and c:IsMonster()
 end
+function s.filter2(c)
+	return c:IsQuickPlaySpell() and c:IsSetCard(SET_ECLIPSE)
+end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOHAND,nil,2,tp,LOCATION_DECK)
@@ -35,10 +37,10 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	if Duel.IsExistingMatchingCard(Card.IsEclipseQP,tp,LOCATION_DECK,0,1,nil) and
+	if Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_DECK,0,1,nil) and
 	Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) and
 	Duel.IsPlayerCanDraw(1-tp,2) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-		local g=Duel.SelectMatchingCard(tp,Card.IsEclipseQP,tp,LOCATION_DECK,0,1,1,nil)
+		local g=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_DECK,0,1,1,nil)
 		local g2=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 		if #g>0 and #g2>0 then
 			local ac = g:Merge(g2)
