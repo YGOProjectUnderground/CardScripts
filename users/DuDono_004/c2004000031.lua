@@ -1,5 +1,4 @@
 -- Eclipse Observer Maya
-Duel.LoadScript("local_custom_init.lua")
 Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
@@ -56,7 +55,7 @@ function s.value(e,c)
 end
 
 function s.setfilter(c)
-	return c:IsEclipseQP() and c:IsSSetable()
+	return c:IsQuickPlaySpell() and c:IsSetCard(SET_ECLIPSE) and c:IsSSetable()
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
