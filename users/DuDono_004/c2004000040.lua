@@ -1,5 +1,6 @@
 -- Spellbook of Eclipse
 local s, id = GetID()
+Duel.LoadScript("_load_.lua")
 function s.initial_effect(c)
 	-- activate
 	local e1=Effect.CreateEffect(c)
@@ -13,7 +14,7 @@ function s.initial_effect(c)
 end
 
 function s.xyzfilter(c,e,tp,rank)
-	return c:IsType(TYPE_XYZ) and c:IsRankAbove(rank) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+	return c:IsType(TYPE_XYZ) and c:IsRace(RACE_SPELLCASTER) and c:IsRankAbove(rank) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function s.matfilter(c,e,tp)
 	return c:HasLevel() and c:IsRace(RACE_SPELLCASTER) and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetLevel())
