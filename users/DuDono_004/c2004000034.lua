@@ -1,5 +1,4 @@
 -- Eclipse Observer Riley
-Duel.LoadScript("local_custom_init.lua")
 Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
@@ -54,7 +53,7 @@ function s.searchop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.gyfilter(c)
-	return c:IsEclipseQP() and c:IsAbleToHand()
+	return c:IsQuickPlaySpell() and c:IsSetCard(SET_ECLIPSE) and c:IsAbleToHand()
 end
 function s.gycon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==1-tp and ev>=2
