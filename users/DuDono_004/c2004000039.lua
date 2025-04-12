@@ -1,5 +1,4 @@
 -- Eclipse Observer Nora
-Duel.LoadScript("local_custom_init.lua")
 Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
@@ -33,7 +32,7 @@ function s.initial_effect(c)
 end
 
 function s.tgfilter(c)
-	return (c:IsEclipseQP() or c:IsSetCard(SET_ECLIPSE_OBSERVER)) and c:IsAbleToGrave()
+	return ((c:IsQuickPlaySpell() and c:IsSetCard(SET_ECLIPSE)) or c:IsSetCard(SET_ECLIPSE_OBSERVER)) and c:IsAbleToGrave()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
