@@ -33,3 +33,5 @@ SET_AZURIST                        = 0xf16
 SET_STARRYTAIL                     = 0xf13
 SET_LYCANSQUAD                     = 0xf17
 SET_SPARKWAVE                      = 0x2a7
+SET_ECLIPSE          = 0x7b4 --only for Quick-Plays
+SET_ECLIPSE_OBSERVER  = 0x17b4
