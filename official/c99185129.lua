@@ -2,7 +2,6 @@
 --Nekroz of Clausolas
 --modified for CrimsonAlpha
 
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

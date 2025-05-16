@@ -1,6 +1,5 @@
 --Deep Sea Witch
 --Scripted by Zefile, fixed for proper temporary banish
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--banish until end phase

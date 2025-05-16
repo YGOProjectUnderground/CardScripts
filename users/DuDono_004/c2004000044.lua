@@ -1,6 +1,5 @@
 -- Eclipse Observer Aaliyah
 local s, id = GetID()
-Duel.LoadScript("_load_.lua")
 function s.initial_effect(c)
 	-- SS itself from hand
 	local e1=Effect.CreateEffect(c)

@@ -1,6 +1,5 @@
 --Vampire Empress
 --Scripted by Mardras
-Duel.LoadScript("_load_.lua")
 local s,id,alias=GetID()
 function s.initial_effect(c)
 	alias=c:GetOriginalCodeRule()

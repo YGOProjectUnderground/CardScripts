@@ -1,6 +1,5 @@
 -- Azurite
 -- Scripted by Lilac
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 local codes={}
 function s.initial_effect(c)

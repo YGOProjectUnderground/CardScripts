@@ -1,6 +1,5 @@
 -- Eclipse Observer Chandra
 local s, id = GetID()
-Duel.LoadScript("_load_.lua")
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	-- xyz procedure

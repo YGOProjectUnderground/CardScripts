@@ -2,7 +2,6 @@
 --Naturia Vein
 --Modified for CrimsonAlpha
 
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Negate Spell/Trap Card activation

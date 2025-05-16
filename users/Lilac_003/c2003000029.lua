@@ -1,6 +1,5 @@
 -- Melody's Return
 -- Scripted by Lilac
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Add 1 "Trickstar" card frm your Deck to your hand

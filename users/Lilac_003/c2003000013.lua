@@ -1,6 +1,5 @@
 -- Zodic Parthel
 -- Scripted by Lilac
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
     -- Take control of 1 Set monster

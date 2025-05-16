@@ -1,5 +1,4 @@
 -- Night Night, Nemleria
-Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
   -- activate, put Nemleria to sleep and Set a Spell/Trap

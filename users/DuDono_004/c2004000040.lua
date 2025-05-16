@@ -1,6 +1,5 @@
 -- Spellbook of Eclipse
 local s, id = GetID()
-Duel.LoadScript("_load_.lua")
 function s.initial_effect(c)
 	-- activate
 	local e1=Effect.CreateEffect(c)

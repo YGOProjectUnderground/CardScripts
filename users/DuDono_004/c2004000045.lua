@@ -1,6 +1,5 @@
 -- Eclipse Observer Seara
 local s, id = GetID()
-Duel.LoadScript("_load_.lua")
 function s.initial_effect(c)
 	-- This is a Synchro monster
 	c:EnableReviveLimit()

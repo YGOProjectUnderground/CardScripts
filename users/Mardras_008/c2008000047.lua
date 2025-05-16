@@ -1,6 +1,5 @@
 --Chaos Assault Wraith
 --Scripted by Mardras
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
     --Normal Summ "C.W." from the h

@@ -1,5 +1,4 @@
 --Offering to the Furies
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
     --Ritual Summon from Deck or GY
