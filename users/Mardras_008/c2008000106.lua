@@ -1,6 +1,5 @@
 --Skull Guardian, Messenger of the Voiceless Voice
 --Scripted by Mardras
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
     --Tribute it and send a Ritual S to Sp Summ 1 Level 7 LIGHT Dragon Ritual Monster

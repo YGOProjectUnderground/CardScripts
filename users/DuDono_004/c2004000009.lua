@@ -1,5 +1,4 @@
 -- Sparkwave Mellontikos
-Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
   -- link summon
@@ -28,7 +27,7 @@ function s.initial_effect(c)
   e2:SetOperation(s.countop)
   c:RegisterEffect(e2)
 end
-s.counter_place_list = {COUNTER_SPARKWAVE}
+s.counter_place_list = {0x2a7}
 function s.foolcon(e,tp,eg,ep,ev,re,r,rp)
   local c=e:GetHandler()
 	return c:IsSummonType(SUMMON_TYPE_LINK)
@@ -47,18 +46,11 @@ function s.foolop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
-function s.countfilter(c)
-  return c:IsType(TYPE_MONSTER) and c:IsSetCard(SET_SPARKWAVE) and c:HasLevel()
-end
-function s.counttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-  if chkc then return s.countfilter(chkc) and chkc:IsLocation(LOCATION_GRAVE) end
-  if chk==0 then return Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_SZONE,0,1,nil,2004000010) and
-    Duel.IsExistingTarget(s.countfilter,tp,LOCATION_GRAVE,0,1,nil) end
-  Duel.SelectTarget(tp,s.countfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+
+function s.counttg(e,tp,eg,ep,ev,re,r,rp,chk)
+  if chk==0 then return Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_SZONE,0,1,nil,2004000010) end
 end
 function s.countop(e,tp,eg,ep,ev,re,r,rp)
-  local x = e:GetHandler():GetControler()
-  local engine = Duel.SelectMatchingCard(x,Card.IsCode,x,LOCATION_SZONE,0,1,1,nil,2004000010):GetFirst()
-  local g = Duel.GetFirstTarget()
-  engine:AddCounter(COUNTER_SPARKWAVE,g:GetLevel())
+  local engine = Duel.SelectMatchingCard(tp,Card.IsCode,tp,LOCATION_SZONE,0,1,1,nil,2004000010):GetFirst()
+  engine:AddCounter(COUNTER_SPARKWAVE,3)
 end

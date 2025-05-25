@@ -1,4 +1,3 @@
-Duel.LoadScript("_load_.lua")
 local MoveMzone = {
 function(c,p)
 	return c:IsType(TYPE_MONSTER) and (Duel.GetLocationCount(p,LOCATION_MZONE)>0

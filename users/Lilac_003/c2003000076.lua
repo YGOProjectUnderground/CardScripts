@@ -1,6 +1,5 @@
 -- Lycansquad Hauptquartier
 -- Scripted by Eto, fixed by Lilac
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Activate

@@ -1,6 +1,5 @@
 --Tellarknight Constellar Altairasal
 --Scripted by Burai
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Special 1 "tellarknight" or "Constellar"

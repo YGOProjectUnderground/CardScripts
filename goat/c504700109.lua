@@ -1,7 +1,6 @@
 --使徒喰い虫
 --Nobleman-Eater Bug (GOAT)
 --It targets up to 2 monsters
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--flip

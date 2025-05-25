@@ -1,6 +1,5 @@
 -- ハロウフォール・エンチャンテッド・クルセイダー
 -- Hallowfall Enchanted Crusader
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
     --Special Summon itself by discarding S/T (regular effect)

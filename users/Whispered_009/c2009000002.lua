@@ -1,5 +1,4 @@
 --Odd-eyes Trickster Magician
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	Pendulum.AddProcedure(c)

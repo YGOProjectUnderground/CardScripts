@@ -1,5 +1,4 @@
 --Forsaken Oathbreaker Priest
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
     --Special Summon to opponent's field and add Ritual Monsters

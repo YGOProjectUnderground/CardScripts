@@ -1,6 +1,5 @@
 -- Lycansquad Vollmond
 -- Scripted by Lilac & Eto
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Reveal 1 "Lycansquad" Link Monster, take 1 "Lycansquad" monster from your Deck, place on it top or send it to the GY

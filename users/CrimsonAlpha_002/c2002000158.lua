@@ -1,5 +1,4 @@
 --Grim Pact with Exodia
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c) 
 	local e1=Ritual.AddProcGreater{handler=c,

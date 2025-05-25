@@ -1,6 +1,5 @@
 -- Hanna, Paragon of the Azurist
 -- Scripted by Lilac
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	c:RegisterEffect(aux.CreateAzuristRestriction(c,id))

@@ -2,7 +2,6 @@
 --Spear Cretin (GOAT)
 --You cannot choose monsters destroyed at the same time as cretin
 --Optional
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--flip effect

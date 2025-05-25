@@ -1,6 +1,5 @@
 -- ハロウフォール・エンチャンテッド・ナイト
 -- Hallowfall Enchanted Knight
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
     --Special Summon with Field Spell placement (regular effect)
