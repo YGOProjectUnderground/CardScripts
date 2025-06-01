@@ -1,6 +1,5 @@
 --Evilswarm Yidhra
 --Scripted by Burai
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Change 1 monster to face-up or face-down Defense Position

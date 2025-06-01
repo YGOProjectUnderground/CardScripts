@@ -2,7 +2,6 @@
 --Deep Sea Falsetto
 --Scripted by Yag
 --Modified to use revealing WATER Tuner instead of discarding WATER monster
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate

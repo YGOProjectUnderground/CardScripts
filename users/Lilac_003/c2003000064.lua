@@ -1,6 +1,5 @@
 -- Lycansquad Arcane
 -- Scripted by Eto, and fixed by Lilac
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Excavate the top cards of your Deck equal to the Link Rating of the monster sent to the grave

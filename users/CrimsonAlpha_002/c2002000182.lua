@@ -1,5 +1,4 @@
 --Dimension Dice Magician
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 local sid=300102004
 function s.initial_effect(c)

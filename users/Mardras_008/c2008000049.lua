@@ -1,6 +1,5 @@
 --Horus the Black Flame Dragon LV10
 --Scrypted by Mardras
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

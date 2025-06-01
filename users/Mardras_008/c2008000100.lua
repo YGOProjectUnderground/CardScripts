@@ -1,6 +1,5 @@
 --Dark Offering
 --Scripted by Mardras
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Sp summ 1 "Summoned Skull" or a m that mention it from your d/GY

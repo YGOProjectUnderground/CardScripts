@@ -1,5 +1,4 @@
 --デス・コアラ
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--flip

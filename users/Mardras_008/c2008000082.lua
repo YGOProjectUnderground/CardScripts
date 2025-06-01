@@ -1,6 +1,5 @@
 --Eldlich the Golden Knight
 --Scripted by Mardras
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--shuffle 1 c from field/rm into the D

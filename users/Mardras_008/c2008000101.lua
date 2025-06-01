@@ -1,6 +1,5 @@
 --Scarlet Flame
 --Scripted by Mardras
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 local TYPES=TYPE_RITUAL|TYPE_PENDULUM
 function s.initial_effect(c)

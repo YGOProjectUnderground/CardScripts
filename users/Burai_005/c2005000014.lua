@@ -1,6 +1,5 @@
 --PSY-Frame Enginer
 --Scripted by Burai
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Name becomes "PSY-Frame Driver" while in hand or GY

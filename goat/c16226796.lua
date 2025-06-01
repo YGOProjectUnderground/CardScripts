@@ -1,6 +1,5 @@
 --深淵の暗殺者 (Pre-Errata)
 --Night Assailant (Pre-Errata)
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	--Destroy

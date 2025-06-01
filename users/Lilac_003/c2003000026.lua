@@ -1,6 +1,5 @@
 -- Lishenna's Monody
 -- Scripted by Lilac
-Duel.LoadScript("_load_.lua")
 local s,id=GetID()
 function s.initial_effect(c)
 	-- Return both 1 "Trickstar" monster you control and 1 card your opponent controls

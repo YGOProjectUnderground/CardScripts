@@ -1,9 +1,8 @@
 -- Sparkwave Tulevaisuutta
-Duel.LoadScript("_load_.lua")
 local s, id = GetID()
 function s.initial_effect(c)
     -- link procedure
-    Link.AddProcedure(c, nil, 2, 4, s.lcheck)
+    Link.AddProcedure(c, nil, 2, 5, s.lcheck)
     c:EnableReviveLimit()
     -- shuffle cards into the deck
     local e1 = Effect.CreateEffect(c)
