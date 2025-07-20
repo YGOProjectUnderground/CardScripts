@@ -64,7 +64,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	--Cannot Special Summon from the Extra Deck, except Synchro monsters
+	--Cannot Special Summon from the Extra Deck, except Synchro or Link Plant/Dragon monsters
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(aux.Stringid(id,4))
 	e1:SetType(EFFECT_TYPE_FIELD)
