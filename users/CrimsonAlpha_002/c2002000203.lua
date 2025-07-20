@@ -118,7 +118,7 @@ end
 
 function s.stcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsLinkSummoned()
 end
 function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b1=Duel.GetLocationCount(tp,LOCATION_SZONE)>1
